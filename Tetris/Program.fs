@@ -44,7 +44,7 @@ type MainWindow() as this =
                 |> ignore 
             Cmd.ofSub sub
 
-        Elmish.Program.mkSimple (fun () -> Game.init ) Game.update Game.view
+        Elmish.Program.mkSimple (fun () -> Game.init() ) Game.update Game.view
         |> Program.withHost this 
         |> Program.withSubscription timer
         |> Program.withSubscription keyDownHandler

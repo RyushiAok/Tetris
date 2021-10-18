@@ -26,7 +26,7 @@ module Game =
         | Left | Right| Down | RotL | RotR  
         | Hold  
 
-    let init  =  
+    let init () =  
         { tetrimino = Tetrimino.generate true 
           hold = None
           grid = 
@@ -140,7 +140,7 @@ module Game =
                     tetrimino = Tetrimino.generate false
                     hold = Some (Tetrimino.initMino state.tetrimino.shape)
                 } 
-        | NewGame -> init 
+        | NewGame -> init ()
         | _  -> state 
 
     let shapeToColor shape = 
