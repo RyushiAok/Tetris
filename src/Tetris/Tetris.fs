@@ -213,7 +213,7 @@ module Game =
                         if not state.isOver && minoPos |> Array.contains (x, y) then
                             yield shapeToColor minoShape
                         else
-                            match cells.[y, x] with
+                            match cells[y, x] with
                             | Cell.Empty -> yield "#222222"
                             | Cell.Guard -> yield "#AAAAAA"
                             | Cell.Mino shape -> yield shapeToColor shape

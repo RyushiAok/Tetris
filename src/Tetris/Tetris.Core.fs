@@ -33,7 +33,7 @@ module TetrisBoard =
                 Cell.Guard)
 
     let isFilled x y (board: TetrisBoard) =
-        board.[y, x]
+        board[y, x]
         |> function
             | Empty -> false
             | _ -> true
@@ -42,8 +42,7 @@ module TetrisBoard =
         let nxt = board |> Array2D.copy
 
         mino.pos
-        |> Array.iter (fun (dx, dy) ->
-            nxt.[mino.y + dy, mino.x + dx] <- Mino mino.shape)
+        |> Array.iter (fun (dx, dy) -> nxt[mino.y + dy, mino.x + dx] <- Mino mino.shape)
 
         let mutable dy = 0
 
@@ -57,7 +56,7 @@ module TetrisBoard =
 
                     if isLineFilled then
                         for x in 3..12 do
-                            nxt.[y, x] <- Empty
+                            nxt[y, x] <- Empty
 
                         yield y
                         dy <- dy + 1
@@ -69,7 +68,7 @@ module TetrisBoard =
 
         for y in 21 .. (-1) .. 0 do
             for x in 3..12 do
-                nxt.[dif.[y], x] <- nxt.[y, x]
+                nxt[dif[y], x] <- nxt[y, x]
 
         {| newBoard = nxt; eraced = dy |}
 
@@ -151,31 +150,31 @@ module Tetrimino =
             | (0, -1) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
         | Shape.L ->
-            match mino.pos.[2] with
+            match mino.pos[2] with
             | (0, 1) -> MinoTheta.``0``
             | (1, 0) -> MinoTheta.``90``
             | (0, -1) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
         | Shape.Z ->
-            match mino.pos.[3] with
+            match mino.pos[3] with
             | (1, 0) -> MinoTheta.``0``
             | (0, -1) -> MinoTheta.``90``
             | (-1, 0) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
         | Shape.J ->
-            match mino.pos.[1] with
+            match mino.pos[1] with
             | (1, 0) -> MinoTheta.``0``
             | (0, 1) -> MinoTheta.``90``
             | (-1, 0) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
         | Shape.S ->
-            match mino.pos.[1] with
+            match mino.pos[1] with
             | (0, -1) -> MinoTheta.``0``
             | (0, 1) -> MinoTheta.``90``
             | (1, 0) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
         | Shape.I ->
-            match mino.pos.[1] with
+            match mino.pos[1] with
             | (-1, 0) -> MinoTheta.``0``
             | (0, 1) -> MinoTheta.``90``
             | (1, 0) -> MinoTheta.``180``
@@ -185,32 +184,32 @@ module Tetrimino =
         match mino.shape with
         | Shape.T ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos.[0]; mino.pos.[3]; (-1, 1); (-1, 2) ]
-            | MinoTheta.``90`` -> [ mino.pos.[0]; mino.pos.[3] ]
-            | MinoTheta.``180`` -> [ mino.pos.[0]; mino.pos.[2] ]
-            | MinoTheta.``270`` -> [ mino.pos.[0]; mino.pos.[3] ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (-1, 1); (-1, 2) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[2] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
         | Shape.S ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos.[0]; (0, 1) ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; (0, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos.[0]; (-1, -1) ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; (-1, -1) ]
             | _ -> [ (0, 0) ]
         | Shape.L ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos.[0]; (-1, 0) ]
-            | MinoTheta.``90`` -> [ mino.pos.[0]; mino.pos.[2]; (-1, 1) ]
-            | MinoTheta.``180`` -> [ mino.pos.[0]; mino.pos.[1] ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; (-1, 0) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[2]; (-1, 1) ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
             | MinoTheta.``270`` -> [ (0, 0) ]
         | Shape.J ->
             match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos.[0]; mino.pos.[1] ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
         | Shape.I ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos.[0]; mino.pos.[1] ]
-            | MinoTheta.``90`` -> [ mino.pos.[0]; mino.pos.[1] ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
         | _ -> [ (0, 0) ]
 
@@ -219,32 +218,32 @@ module Tetrimino =
         match mino.shape with
         | Shape.T ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos.[0]; mino.pos.[3]; (1, 1); (1, 2) ]
-            | MinoTheta.``90`` -> [ mino.pos.[0]; mino.pos.[3] ]
-            | MinoTheta.``180`` -> [ mino.pos.[0]; mino.pos.[1] ]
-            | MinoTheta.``270`` -> [ mino.pos.[0]; mino.pos.[3] ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (1, 1); (1, 2) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
         | Shape.S ->
             match getTheta mino with
-            | MinoTheta.``270`` -> [ mino.pos.[0]; (1, 1) ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; (1, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
             match getTheta mino with
-            | MinoTheta.``270`` -> [ mino.pos.[0]; (1, 1) ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; (1, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.L ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos.[0]; mino.pos.[2] ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[2] ]
             | _ -> [ (0, 0) ]
         | Shape.J ->
             match getTheta mino with
             | MinoTheta.``0`` -> [ (0, 0) ]
-            | MinoTheta.``90`` -> [ mino.pos.[0]; (1, 0) ]
-            | MinoTheta.``180`` -> [ mino.pos.[0]; mino.pos.[1]; (1, 1) ]
-            | MinoTheta.``270`` -> [ mino.pos.[0]; mino.pos.[2] ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; (1, 0) ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1]; (1, 1) ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[2] ]
         | Shape.I ->
             match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos.[0]; mino.pos.[1] ]
-            | MinoTheta.``180`` -> [ mino.pos.[0]; mino.pos.[1] ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
         | _ -> [ (0, 0) ]
 
@@ -410,12 +409,12 @@ module Tetrimino =
 
                 for i in 0 .. blocks.Length - 1 do
                     let r = random.Next(0, blocks.Length)
-                    let tmp = b.[i]
-                    b.[i] <- b.[r]
-                    b.[r] <- tmp
+                    let tmp = b[i]
+                    b[i] <- b[r]
+                    b[r] <- tmp
 
-                queue <- Array.toList b.[1 .. b.Length - 1]
-                b.[0]
+                queue <- Array.toList b[1 .. b.Length - 1]
+                b[0]
             | h :: t ->
                 queue <- t
                 h
