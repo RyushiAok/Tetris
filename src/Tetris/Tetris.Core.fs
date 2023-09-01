@@ -158,7 +158,7 @@ module Tetrimino =
         | Shape.Z ->
             match mino.pos[3] with
             | (1, 0) -> MinoTheta.``0``
-            | (0, -1) -> MinoTheta.``90``
+            | (0, 1) -> MinoTheta.``90``
             | (-1, 0) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
         | Shape.J ->
@@ -228,7 +228,7 @@ module Tetrimino =
             | _ -> [ (0, 0) ]
         | Shape.Z ->
             match getTheta mino with
-            | MinoTheta.``270`` -> [ mino.pos[0]; (1, 1) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; (1, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.L ->
             match getTheta mino with
