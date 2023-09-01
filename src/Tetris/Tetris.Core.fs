@@ -16,11 +16,12 @@ type Cell =
 
 type TetrisBoard = Cell[,]
 
-type Tetrimino =
-    { x: int
-      y: int
-      pos: (int * int)[]
-      shape: Shape }
+type Tetrimino = {
+    x: int
+    y: int
+    pos: (int * int)[]
+    shape: Shape
+}
 
 module TetrisBoard =
 
@@ -47,23 +48,24 @@ module TetrisBoard =
         let mutable dy = 0
 
         let dif =
-            List.rev
-                [ yield 23
-                  yield 22
-                  for y in 21..-1..2 do
-                      let isLineFilled =
-                          [ 3..12 ] |> List.forall (fun x -> isFilled x y nxt)
+            List.rev [
+                yield 23
+                yield 22
+                for y in 21..-1..2 do
+                    let isLineFilled =
+                        [ 3..12 ] |> List.forall (fun x -> isFilled x y nxt)
 
-                      if isLineFilled then
-                          for x in 3..12 do
-                              nxt.[y, x] <- Empty
+                    if isLineFilled then
+                        for x in 3..12 do
+                            nxt.[y, x] <- Empty
 
-                          yield y
-                          dy <- dy + 1
-                      else
-                          yield y + dy
-                  yield 1
-                  yield 0 ]
+                        yield y
+                        dy <- dy + 1
+                    else
+                        yield y + dy
+                yield 1
+                yield 0
+            ]
 
         for y in 21 .. (-1) .. 0 do
             for x in 3..12 do
@@ -76,54 +78,61 @@ module Tetrimino =
 
     let initMino =
         function
-        | I ->
-            { x = 7
-              y = 2
-              shape = Shape.I
-              // 1 0 2 3
-              pos = [| (0, 0); (-1, 0); (1, 0); (2, 0) |] }
-        | O ->
-            { x = 7
-              y = 2
-              shape = Shape.O
-              // 2 3
-              // 0 1
-              pos = [| (0, 0); (1, 0); (0, -1); (1, -1) |] }
-        | S ->
-            { x = 7
-              y = 2
-              shape = Shape.S
-              //   2 3
-              // 1 0
-              pos = [| (0, 0); (-1, 0); (0, -1); (1, -1) |] }
-        | Z ->
-            { x = 7
-              y = 2
-              shape = Shape.Z
-              //  1 2
-              //    0 3
-              pos = [| (0, 0); (-1, -1); (0, -1); (1, 0) |] }
-        | J ->
-            { x = 7
-              y = 2
-              shape = Shape.J
-              // 3
-              // 2 0 1
-              pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |] }
-        | L ->
-            { x = 7
-              y = 2
-              shape = Shape.L
-              //     3
-              // 2 0 1
-              pos = [| (0, 0); (1, 0); (-1, 0); (1, -1) |] }
-        | T ->
-            { x = 7
-              y = 2
-              shape = Shape.T
-              // 1 0 2
-              //   3
-              pos = [| (0, 0); (-1, 0); (1, 0); (0, 1) |] }
+        | I -> {
+            x = 7
+            y = 2
+            shape = Shape.I
+            // 1 0 2 3
+            pos = [| (0, 0); (-1, 0); (1, 0); (2, 0) |]
+          }
+        | O -> {
+            x = 7
+            y = 2
+            shape = Shape.O
+            // 2 3
+            // 0 1
+            pos = [| (0, 0); (1, 0); (0, -1); (1, -1) |]
+          }
+        | S -> {
+            x = 7
+            y = 2
+            shape = Shape.S
+            //   2 3
+            // 1 0
+            pos = [| (0, 0); (-1, 0); (0, -1); (1, -1) |]
+          }
+        | Z -> {
+            x = 7
+            y = 2
+            shape = Shape.Z
+            //  1 2
+            //    0 3
+            pos = [| (0, 0); (-1, -1); (0, -1); (1, 0) |]
+          }
+        | J -> {
+            x = 7
+            y = 2
+            shape = Shape.J
+            // 3
+            // 2 0 1
+            pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |]
+          }
+        | L -> {
+            x = 7
+            y = 2
+            shape = Shape.L
+            //     3
+            // 2 0 1
+            pos = [| (0, 0); (1, 0); (-1, 0); (1, -1) |]
+          }
+        | T -> {
+            x = 7
+            y = 2
+            shape = Shape.T
+            // 1 0 2
+            //   3
+            pos = [| (0, 0); (-1, 0); (1, 0); (0, 1) |]
+          }
 
     [<RequireQualifiedAccess>]
     type MinoTheta =
@@ -176,8 +185,7 @@ module Tetrimino =
         match mino.shape with
         | Shape.T ->
             match getTheta mino with
-            | MinoTheta.``0`` ->
-                [ mino.pos.[0]; mino.pos.[3]; (-1, 1); (-1, 2) ]
+            | MinoTheta.``0`` -> [ mino.pos.[0]; mino.pos.[3]; (-1, 1); (-1, 2) ]
             | MinoTheta.``90`` -> [ mino.pos.[0]; mino.pos.[3] ]
             | MinoTheta.``180`` -> [ mino.pos.[0]; mino.pos.[2] ]
             | MinoTheta.``270`` -> [ mino.pos.[0]; mino.pos.[3] ]
@@ -242,7 +250,9 @@ module Tetrimino =
 
     let isHighLimitOver mino =
         let highLimit = 3
-        mino.pos |> Array.exists (fun (_, y) -> mino.y + y <= highLimit)
+
+        mino.pos
+        |> Array.exists (fun (_, y) -> mino.y + y <= highLimit)
 
     let existsOtherBlock board mino =
         mino.pos
@@ -293,26 +303,25 @@ module Tetrimino =
 
                             pos
                             |> Array.exists (fun (dx, dy) ->
-                                board
-                                |> TetrisBoard.isFilled (nx + dx) (ny + dy))
+                                board |> TetrisBoard.isFilled (nx + dx) (ny + dy))
                             |> function
                                 | true -> loop2 t2
-                                | false ->
-                                    { mino with x = nx; y = ny; pos = pos }
+                                | false -> { mino with x = nx; y = ny; pos = pos }
 
                     loop2 r_asixs
 
             let moved =
-                loop
-                    [ (0, 0)
-                      (0, 1)
-                      (-1, 0)
-                      (1, 0)
-                      (0, -1)
-                      (2, 0)
-                      (0, -2)
-                      (-2, 0)
-                      (0, 2) ]
+                loop [
+                    (0, 0)
+                    (0, 1)
+                    (-1, 0)
+                    (1, 0)
+                    (0, -1)
+                    (2, 0)
+                    (0, -2)
+                    (-2, 0)
+                    (0, 2)
+                ]
 
             let modify = // 高さの調整
                 if moved.y < mino.y then { moved with y = moved.y + 1 }
@@ -346,26 +355,25 @@ module Tetrimino =
 
                             pos
                             |> Array.exists (fun (dx, dy) ->
-                                board
-                                |> TetrisBoard.isFilled (nx + dx) (ny + dy))
+                                board |> TetrisBoard.isFilled (nx + dx) (ny + dy))
                             |> function
-                                | false ->
-                                    { mino with x = nx; y = ny; pos = pos }
+                                | false -> { mino with x = nx; y = ny; pos = pos }
                                 | true -> loop2 t2
 
                     loop2 r_asixs
 
             let moved =
-                loop
-                    [ (0, 0)
-                      (0, 1)
-                      (-1, 0)
-                      (1, 0)
-                      (0, -1)
-                      (2, 0)
-                      (0, -2)
-                      (-2, 0)
-                      (0, 2) ]
+                loop [
+                    (0, 0)
+                    (0, 1)
+                    (-1, 0)
+                    (1, 0)
+                    (0, -1)
+                    (2, 0)
+                    (0, -2)
+                    (-2, 0)
+                    (0, 2)
+                ]
 
             let modified =
                 if moved.y < mino.y then { moved with y = moved.y + 1 }
@@ -382,14 +390,15 @@ module Tetrimino =
         let mutable queue = []
         let random = System.Random()
 
-        let blocks =
-            [| initMino Shape.I
-               initMino Shape.O
-               initMino Shape.S
-               initMino Shape.Z
-               initMino Shape.J
-               initMino Shape.L
-               initMino Shape.T |]
+        let blocks = [|
+            initMino Shape.I
+            initMino Shape.O
+            initMino Shape.S
+            initMino Shape.Z
+            initMino Shape.J
+            initMino Shape.L
+            initMino Shape.T
+        |]
 
         fun reset ->
             if reset then
