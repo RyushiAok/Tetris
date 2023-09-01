@@ -1,2 +1,5 @@
 [*.fs]
-max_line_length = 80
+max_line_length = 88
+fsharp_max_infix_operator_expression = 60
+fsharp_max_dot_get_expression = 60
+fsharp_multiline_bracket_style = stroustrup

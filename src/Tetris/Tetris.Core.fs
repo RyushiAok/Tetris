@@ -16,11 +16,12 @@ type Cell =
 
 type TetrisBoard = Cell[,]
 
-type Tetrimino =
-    { x: int
-      y: int
-      pos: (int * int)[]
-      shape: Shape }
+type Tetrimino = {
+    x: int
+    y: int
+    pos: (int * int)[]
+    shape: Shape
+}
 
 module TetrisBoard =
 
@@ -32,7 +33,7 @@ module TetrisBoard =
                 Cell.Guard)
 
     let isFilled x y (board: TetrisBoard) =
-        board.[y, x]
+        board[y, x]
         |> function
             | Empty -> false
             | _ -> true
@@ -41,155 +42,252 @@ module TetrisBoard =
         let nxt = board |> Array2D.copy
 
         mino.pos
-        |> Array.iter (fun (dx, dy) ->
-            nxt.[mino.y + dy, mino.x + dx] <- Mino mino.shape)
+        |> Array.iter (fun (dx, dy) -> nxt[mino.y + dy, mino.x + dx] <- Mino mino.shape)
 
         let mutable dy = 0
 
         let dif =
-            List.rev
-                [ yield 23
-                  yield 22
-                  for y in 21..-1..2 do
-                      let isLineFilled =
-                          [ 3..12 ] |> List.forall (fun x -> isFilled x y nxt)
+            List.rev [
+                yield 23
+                yield 22
+                for y in 21..-1..2 do
+                    let isLineFilled =
+                        [ 3..12 ] |> List.forall (fun x -> isFilled x y nxt)
 
-                      if isLineFilled then
-                          for x in 3..12 do
-                              nxt.[y, x] <- Empty
+                    if isLineFilled then
+                        for x in 3..12 do
+                            nxt[y, x] <- Empty
 
-                          yield y
-                          dy <- dy + 1
-                      else
-                          yield y + dy
-                  yield 1
-                  yield 0 ]
+                        yield y
+                        dy <- dy + 1
+                    else
+                        yield y + dy
+                yield 1
+                yield 0
+            ]
 
         for y in 21 .. (-1) .. 0 do
             for x in 3..12 do
-                nxt.[dif.[y], x] <- nxt.[y, x]
+                nxt[dif[y], x] <- nxt[y, x]
 
         {| newBoard = nxt; eraced = dy |}
 
 
 module Tetrimino =
 
-    let private highLimit = 3
-
     let initMino =
         function
-        | I ->
-            { x = 7
-              y = 2
-              shape = Shape.I
-              pos = [| (0, 0); (-1, 0); (1, 0); (2, 0) |] }
-        | O ->
-            { x = 7
-              y = 2
-              shape = Shape.O
-              pos = [| (0, 0); (1, 0); (0, -1); (1, -1) |] }
-        | S ->
-            { x = 7
-              y = 2
-              shape = Shape.S
-              pos = [| (0, 0); (-1, 0); (0, -1); (1, -1) |] }
-        | Z ->
-            { x = 7
-              y = 2
-              shape = Shape.Z
-              pos = [| (0, 0); (-1, -1); (0, -1); (1, 0) |] }
-        | J ->
-            { x = 7
-              y = 2
-              shape = Shape.J
-              pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |] }
-        | L ->
-            { x = 7
-              y = 2
-              shape = Shape.L
-              pos = [| (0, 0); (1, 0); (-1, 0); (1, -1) |] }
-        | T ->
-            { x = 7
-              y = 2
-              shape = Shape.T
-              pos = [| (0, 0); (-1, 0); (1, 0); (0, 1) |] }
+        | I -> {
+            x = 7
+            y = 2
+            shape = Shape.I
+            // 1 0 2 3
+            pos = [| (0, 0); (-1, 0); (1, 0); (2, 0) |]
+          }
+        | O -> {
+            x = 7
+            y = 2
+            shape = Shape.O
+            // 2 3
+            // 0 1
+            pos = [| (0, 0); (1, 0); (0, -1); (1, -1) |]
+          }
+        | S -> {
+            x = 7
+            y = 2
+            shape = Shape.S
+            //   2 3
+            // 1 0
+            pos = [| (0, 0); (-1, 0); (0, -1); (1, -1) |]
+          }
+        | Z -> {
+            x = 7
+            y = 2
+            shape = Shape.Z
+            //  1 2
+            //    0 3
+            pos = [| (0, 0); (-1, -1); (0, -1); (1, 0) |]
+          }
+        | J -> {
+            x = 7
+            y = 2
+            shape = Shape.J
+            // 3
+            // 2 0 1
+            pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |]
+          }
+        | L -> {
+            x = 7
+            y = 2
+            shape = Shape.L
+            //     3
+            // 2 0 1
+            pos = [| (0, 0); (1, 0); (-1, 0); (1, -1) |]
+          }
+        | T -> {
+            x = 7
+            y = 2
+            shape = Shape.T
+            // 1 0 2
+            //   3
+            pos = [| (0, 0); (-1, 0); (1, 0); (0, 1) |]
+          }
+
+    [<RequireQualifiedAccess>]
+    type MinoTheta =
+        | ``0``
+        | ``90``
+        | ``180``
+        | ``270``
+
+    let getTheta mino =
+        match mino.shape with
+        | Shape.O -> MinoTheta.``0``
+        | Shape.T ->
+            match mino.pos[3] with
+            | (0, 1) -> MinoTheta.``0``
+            | (1, 0) -> MinoTheta.``90``
+            | (0, -1) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+        | Shape.L ->
+            match mino.pos[2] with
+            | (0, 1) -> MinoTheta.``0``
+            | (1, 0) -> MinoTheta.``90``
+            | (0, -1) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+        | Shape.Z ->
+            match mino.pos[3] with
+            | (1, 0) -> MinoTheta.``0``
+            | (0, 1) -> MinoTheta.``90``
+            | (-1, 0) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+        | Shape.J ->
+            match mino.pos[1] with
+            | (1, 0) -> MinoTheta.``0``
+            | (0, 1) -> MinoTheta.``90``
+            | (-1, 0) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+        | Shape.S ->
+            match mino.pos[1] with
+            | (0, -1) -> MinoTheta.``0``
+            | (0, 1) -> MinoTheta.``90``
+            | (1, 0) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+        | Shape.I ->
+            match mino.pos[1] with
+            | (-1, 0) -> MinoTheta.``0``
+            | (0, 1) -> MinoTheta.``90``
+            | (1, 0) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+
+    let rightRotAsixs mino =
+        match mino.shape with
+        | Shape.T ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (-1, 1); (-1, 2) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[2] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
+        | Shape.S ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ mino.pos[0]; (0, 1) ]
+            | _ -> [ (0, 0) ]
+        | Shape.Z ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ mino.pos[0]; (-1, -1) ]
+            | _ -> [ (0, 0) ]
+        | Shape.L ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ mino.pos[0]; (-1, 0) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[2]; (-1, 1) ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``270`` -> [ (0, 0) ]
+        | Shape.J ->
+            match getTheta mino with
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
+            | _ -> [ (0, 0) ]
+        | Shape.I ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
+            | _ -> [ (0, 0) ]
+        | _ -> [ (0, 0) ]
+
+
+    let leftRotAsixs mino =
+        match mino.shape with
+        | Shape.T ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (1, 1); (1, 2) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
+        | Shape.S ->
+            match getTheta mino with
+            | MinoTheta.``270`` -> [ mino.pos[0]; (1, 1) ]
+            | _ -> [ (0, 0) ]
+        | Shape.Z ->
+            match getTheta mino with
+            | MinoTheta.``90`` -> [ mino.pos[0]; (1, 1) ]
+            | _ -> [ (0, 0) ]
+        | Shape.L ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[2] ]
+            | _ -> [ (0, 0) ]
+        | Shape.J ->
+            match getTheta mino with
+            | MinoTheta.``0`` -> [ (0, 0) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; (1, 0) ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1]; (1, 1) ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[2] ]
+        | Shape.I ->
+            match getTheta mino with
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
+            | _ -> [ (0, 0) ]
+        | _ -> [ (0, 0) ]
 
     let isHighLimitOver mino =
-        mino.pos |> Array.exists (fun (_, y) -> mino.y + y <= highLimit)
+        let highLimit = 3
+
+        mino.pos
+        |> Array.exists (fun (_, y) -> mino.y + y <= highLimit)
 
     let existsOtherBlock board mino =
         mino.pos
         |> Array.exists (fun (dx, dy) ->
             board |> TetrisBoard.isFilled (mino.x + dx) (mino.y + dy))
 
-    let moveDown board mino =
-        let nxt = { mino with y = mino.y + 1 }
+    type private ShiftDirection =
+        | Down
+        | Right
+        | Left
 
-        nxt
-        |> existsOtherBlock board
-        |> function
-            | false -> nxt
-            | true -> mino
+    let private tryShift direction board mino =
+        let nxt =
+            match direction with
+            | Down -> { mino with y = mino.y + 1 }
+            | Right -> { mino with x = mino.x + 1 }
+            | Left -> { mino with x = mino.x - 1 }
+
+        if existsOtherBlock board nxt then None else Some nxt
+
+    let moveDown board mino =
+        tryShift Down board mino |> Option.defaultValue mino
 
     let moveRight board mino =
-        let nxt = { mino with x = mino.x + 1 }
-
-        nxt
-        |> existsOtherBlock board
-        |> function
-            | false -> nxt
-            | true -> mino
+        tryShift Right board mino |> Option.defaultValue mino
 
     let moveLeft board mino =
-        let nxt = { mino with x = mino.x - 1 }
-
-        nxt
-        |> existsOtherBlock board
-        |> function
-            | false -> nxt
-            | true -> mino
-
+        tryShift Left board mino |> Option.defaultValue mino
 
     let rotateRight board mino = // https://tetrisch.github.io/main/spins.html
         if mino.shape = Shape.O then
             mino
         else
-            let pos =
-                [| for (dx, dy) in mino.pos do
-                       (-dy, dx) |]
+            let pos = [| for (dx, dy) in mino.pos -> (-dy, dx) |]
 
-            let r_asixs =
-                match mino.shape with
-                | Shape.T ->
-                    match mino.pos.[3] with
-                    | (0, 1) -> [ mino.pos.[0]; mino.pos.[3]; (-1, 1); (-1, 2) ]
-                    | (-1, 0) -> [ mino.pos.[0]; mino.pos.[3] ]
-                    | (0, -1) -> [ mino.pos.[0]; mino.pos.[2] ]
-                    | _ -> [ mino.pos.[0]; mino.pos.[3] ]
-                | Shape.S ->
-                    match mino.pos.[1] with
-                    | (0, -1) -> [ mino.pos.[0]; (0, 1) ]
-                    | _ -> [ (0, 0) ]
-                | Shape.Z ->
-                    match mino.pos.[3] with
-                    | (1, 0) -> [ mino.pos.[0]; (-1, -1) ]
-                    | _ -> [ (0, 0) ]
-                | Shape.L ->
-                    match mino.pos.[2] with
-                    | (0, 1) -> [ mino.pos.[0]; (-1, 0) ]
-                    | (0, -1) -> [ mino.pos.[0]; mino.pos.[1] ]
-                    | (1, 0) -> [ mino.pos.[0]; mino.pos.[2]; (-1, 1) ] // before: | (-1,0)
-                    | _ -> [ (0, 0) ]
-                | Shape.J ->
-                    match mino.pos.[1] with
-                    | (0, 1) -> [ mino.pos.[0]; mino.pos.[1] ]
-                    | _ -> [ (0, 0) ]
-                | Shape.I ->
-                    match mino.pos.[1] with
-                    | (-1, 0) -> [ mino.pos.[0]; mino.pos.[1] ]
-                    | (0, 1) -> [ mino.pos.[0]; mino.pos.[1] ]
-                    | _ -> [ (0, 0) ]
-                | _ -> [ (0, 0) ]
+            let r_asixs = rightRotAsixs mino
 
             let rec loop =
                 function
@@ -204,26 +302,25 @@ module Tetrimino =
 
                             pos
                             |> Array.exists (fun (dx, dy) ->
-                                board
-                                |> TetrisBoard.isFilled (nx + dx) (ny + dy))
+                                board |> TetrisBoard.isFilled (nx + dx) (ny + dy))
                             |> function
                                 | true -> loop2 t2
-                                | false ->
-                                    { mino with x = nx; y = ny; pos = pos }
+                                | false -> { mino with x = nx; y = ny; pos = pos }
 
                     loop2 r_asixs
 
             let moved =
-                loop
-                    [ (0, 0)
-                      (0, 1)
-                      (-1, 0)
-                      (1, 0)
-                      (0, -1)
-                      (2, 0)
-                      (0, -2)
-                      (-2, 0)
-                      (0, 2) ]
+                loop [
+                    (0, 0)
+                    (0, 1)
+                    (-1, 0)
+                    (1, 0)
+                    (0, -1)
+                    (2, 0)
+                    (0, -2)
+                    (-2, 0)
+                    (0, 2)
+                ]
 
             let modify = // 高さの調整
                 if moved.y < mino.y then { moved with y = moved.y + 1 }
@@ -240,42 +337,9 @@ module Tetrimino =
         if mino.shape = Shape.O then
             mino
         else
-            let pos =
-                [| for (dx, dy) in mino.pos do
-                       (dy, -dx) |]
+            let pos = [| for (dx, dy) in mino.pos -> (dy, -dx) |]
 
-            let r_asixs =
-                match mino.shape with
-                | Shape.T ->
-                    match mino.pos.[3] with
-                    | (0, 1) -> [ mino.pos.[0]; mino.pos.[3]; (1, 1); (1, 2) ]
-                    | (-1, 0) -> [ mino.pos.[0]; mino.pos.[3] ]
-                    | (0, -1) -> [ mino.pos.[0]; mino.pos.[1] ]
-                    | _ -> [ mino.pos.[0]; mino.pos.[3] ] // (1,0)
-                | Shape.S ->
-                    match mino.pos.[1] with
-                    | (-1, 0) -> [ mino.pos.[0]; (1, 1) ]
-                    | _ -> [ (0, 0) ]
-                | Shape.Z ->
-                    match mino.pos.[3] with
-                    | (0, 1) -> [ mino.pos.[0]; (1, 1) ]
-                    | _ -> [ (0, 0) ]
-                | Shape.L ->
-                    match mino.pos.[2] with
-                    | (0, 1) -> [ mino.pos.[0]; mino.pos.[2] ]
-                    | _ -> [ (0, 0) ]
-                | Shape.J ->
-                    match mino.pos.[1] with
-                    | (0, 1) -> [ mino.pos.[0]; (1, 0) ]
-                    | (0, -1) -> [ mino.pos.[0]; mino.pos.[2] ]
-                    | (-1, 0) -> [ mino.pos.[0]; mino.pos.[1]; (1, 1) ]
-                    | _ -> [ (0, 0) ]
-                | Shape.I ->
-                    match mino.pos.[1] with
-                    | (1, 0) -> [ mino.pos.[0]; mino.pos.[1] ]
-                    | (0, 1) -> [ mino.pos.[0]; mino.pos.[1] ]
-                    | _ -> [ (0, 0) ]
-                | _ -> [ (0, 0) ]
+            let r_asixs = leftRotAsixs mino
 
             let rec loop =
                 function
@@ -290,26 +354,25 @@ module Tetrimino =
 
                             pos
                             |> Array.exists (fun (dx, dy) ->
-                                board
-                                |> TetrisBoard.isFilled (nx + dx) (ny + dy))
+                                board |> TetrisBoard.isFilled (nx + dx) (ny + dy))
                             |> function
-                                | false ->
-                                    { mino with x = nx; y = ny; pos = pos }
+                                | false -> { mino with x = nx; y = ny; pos = pos }
                                 | true -> loop2 t2
 
                     loop2 r_asixs
 
             let moved =
-                loop
-                    [ (0, 0)
-                      (0, 1)
-                      (-1, 0)
-                      (1, 0)
-                      (0, -1)
-                      (2, 0)
-                      (0, -2)
-                      (-2, 0)
-                      (0, 2) ]
+                loop [
+                    (0, 0)
+                    (0, 1)
+                    (-1, 0)
+                    (1, 0)
+                    (0, -1)
+                    (2, 0)
+                    (0, -2)
+                    (-2, 0)
+                    (0, 2)
+                ]
 
             let modified =
                 if moved.y < mino.y then { moved with y = moved.y + 1 }
@@ -326,14 +389,15 @@ module Tetrimino =
         let mutable queue = []
         let random = System.Random()
 
-        let blocks =
-            [| initMino Shape.I
-               initMino Shape.O
-               initMino Shape.S
-               initMino Shape.Z
-               initMino Shape.J
-               initMino Shape.L
-               initMino Shape.T |]
+        let blocks = [|
+            initMino Shape.I
+            initMino Shape.O
+            initMino Shape.S
+            initMino Shape.Z
+            initMino Shape.J
+            initMino Shape.L
+            initMino Shape.T
+        |]
 
         fun reset ->
             if reset then
@@ -345,12 +409,12 @@ module Tetrimino =
 
                 for i in 0 .. blocks.Length - 1 do
                     let r = random.Next(0, blocks.Length)
-                    let tmp = b.[i]
-                    b.[i] <- b.[r]
-                    b.[r] <- tmp
+                    let tmp = b[i]
+                    b[i] <- b[r]
+                    b[r] <- tmp
 
-                queue <- Array.toList b.[1 .. b.Length - 1]
-                b.[0]
+                queue <- Array.toList b[1 .. b.Length - 1]
+                b[0]
             | h :: t ->
                 queue <- t
                 h
