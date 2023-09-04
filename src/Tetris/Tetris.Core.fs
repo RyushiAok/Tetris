@@ -1,5 +1,6 @@
-﻿module Tetris.Core
+module Tetris.Core
 
+[<RequireQualifiedAccess>]
 type Shape =
     | I
     | O
@@ -25,7 +26,7 @@ type Tetrimino = {
 
 module TetrisBoard =
 
-    let init =
+    let init () =
         Array2D.init 24 16 (fun y x ->
             if (3 <= x && x <= 12 && 0 <= y && y <= 21) then
                 Cell.Empty
@@ -33,10 +34,9 @@ module TetrisBoard =
                 Cell.Guard)
 
     let isFilled x y (board: TetrisBoard) =
-        board[y, x]
-        |> function
-            | Empty -> false
-            | _ -> true
+        match board[y, x] with
+        | Empty -> false
+        | _ -> true
 
     let setTetrimino mino board =
         let nxt = board |> Array2D.copy
@@ -66,7 +66,7 @@ module TetrisBoard =
                 yield 0
             ]
 
-        for y in 21 .. (-1) .. 0 do
+        for y in 21..-1..0 do
             for x in 3..12 do
                 nxt[dif[y], x] <- nxt[y, x]
 
@@ -75,58 +75,58 @@ module TetrisBoard =
 
 module Tetrimino =
 
-    let initMino =
+    let create (x, y) =
         function
-        | I -> {
-            x = 7
-            y = 2
+        | Shape.I -> {
+            x = x
+            y = y
             shape = Shape.I
             // 1 0 2 3
             pos = [| (0, 0); (-1, 0); (1, 0); (2, 0) |]
           }
-        | O -> {
-            x = 7
-            y = 2
+        | Shape.O -> {
+            x = x
+            y = y
             shape = Shape.O
             // 2 3
             // 0 1
             pos = [| (0, 0); (1, 0); (0, -1); (1, -1) |]
           }
-        | S -> {
-            x = 7
-            y = 2
+        | Shape.S -> {
+            x = x
+            y = y
             shape = Shape.S
             //   2 3
             // 1 0
             pos = [| (0, 0); (-1, 0); (0, -1); (1, -1) |]
           }
-        | Z -> {
-            x = 7
-            y = 2
+        | Shape.Z -> {
+            x = x
+            y = y
             shape = Shape.Z
             //  1 2
             //    0 3
             pos = [| (0, 0); (-1, -1); (0, -1); (1, 0) |]
           }
-        | J -> {
-            x = 7
-            y = 2
+        | Shape.J -> {
+            x = x
+            y = y
             shape = Shape.J
             // 3
             // 2 0 1
             pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |]
           }
-        | L -> {
-            x = 7
-            y = 2
+        | Shape.L -> {
+            x = x
+            y = y
             shape = Shape.L
             //     3
             // 2 0 1
             pos = [| (0, 0); (1, 0); (-1, 0); (1, -1) |]
           }
-        | T -> {
-            x = 7
-            y = 2
+        | Shape.T -> {
+            x = x
+            y = y
             shape = Shape.T
             // 1 0 2
             //   3
@@ -140,7 +140,7 @@ module Tetrimino =
         | ``180``
         | ``270``
 
-    let getTheta mino =
+    let private getTheta mino =
         match mino.shape with
         | Shape.O -> MinoTheta.``0``
         | Shape.T ->
@@ -281,7 +281,7 @@ module Tetrimino =
     let moveLeft board mino =
         tryShift Left board mino |> Option.defaultValue mino
 
-    let rotateRight board mino = // https://tetrisch.github.io/main/spins.html
+    let rotateRight board mino =
         if mino.shape = Shape.O then
             mino
         else
@@ -322,7 +322,7 @@ module Tetrimino =
                     (0, 2)
                 ]
 
-            let modify = // 高さの調整
+            let modify = // adjust mino's height
                 if moved.y < mino.y then { moved with y = moved.y + 1 }
                 elif moved.y > mino.y then { moved with y = moved.y - 1 }
                 else moved
@@ -384,37 +384,3 @@ module Tetrimino =
             |> function
                 | false -> modified
                 | true -> moved
-
-    let generate =
-        let mutable queue = []
-        let random = System.Random()
-
-        let blocks = [|
-            initMino Shape.I
-            initMino Shape.O
-            initMino Shape.S
-            initMino Shape.Z
-            initMino Shape.J
-            initMino Shape.L
-            initMino Shape.T
-        |]
-
-        fun reset ->
-            if reset then
-                queue <- []
-
-            match queue with
-            | [] ->
-                let b = blocks
-
-                for i in 0 .. blocks.Length - 1 do
-                    let r = random.Next(0, blocks.Length)
-                    let tmp = b[i]
-                    b[i] <- b[r]
-                    b[r] <- tmp
-
-                queue <- Array.toList b[1 .. b.Length - 1]
-                b[0]
-            | h :: t ->
-                queue <- t
-                h

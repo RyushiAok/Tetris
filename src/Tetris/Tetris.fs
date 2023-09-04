@@ -29,13 +29,41 @@ type Msg =
     | RotR
     | Hold
 
+let generateMinos =
+    let mutable queue = []
+    let random = Random()
+
+    let blocks =
+        [| Shape.I; Shape.O; Shape.S; Shape.Z; Shape.J; Shape.L; Shape.T |]
+        |> Array.map (Tetrimino.create (7, 2))
+
+    fun reset ->
+        if reset then
+            queue <- []
+
+        match queue with
+        | [] ->
+            let b = blocks
+
+            for i in 0 .. blocks.Length - 1 do
+                let r = random.Next(0, blocks.Length)
+                let tmp = b[i]
+                b[i] <- b[r]
+                b[r] <- tmp
+
+            queue <- Array.toList b[1 .. b.Length - 1]
+            b[0]
+        | h :: t ->
+            queue <- t
+            h
+
 let init () = {
-    tetrimino = Tetrimino.generate true
+    tetrimino = generateMinos true
     hold = None
     grid = {
         width = 16
         height = 24
-        board = TetrisBoard.init
+        board = TetrisBoard.init ()
     }
     lastUpdated = DateTime.Now
     isOver = false
@@ -83,7 +111,7 @@ let update msg state =
                                 }
                         }
                     | false ->
-                        let newMino = Tetrimino.generate false
+                        let newMino = generateMinos false
 
                         let res = state.grid.board |> TetrisBoard.setTetrimino nxt
 
@@ -167,13 +195,13 @@ let update msg state =
             {
                 state with
                     tetrimino = state.hold.Value
-                    hold = Some(Tetrimino.initMino state.tetrimino.shape)
+                    hold = Some(Tetrimino.create (7, 2) state.tetrimino.shape)
             }
         else
             {
                 state with
-                    tetrimino = Tetrimino.generate false
-                    hold = Some(Tetrimino.initMino state.tetrimino.shape)
+                    tetrimino = generateMinos false
+                    hold = Some(Tetrimino.create (7, 2) state.tetrimino.shape)
             }
     | NewGame -> init ()
     | _ -> state
