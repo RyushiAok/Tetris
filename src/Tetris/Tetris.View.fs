@@ -20,11 +20,11 @@ let shapeToColor shape =
     | Shape.Z -> "#ff0000"
     | Shape.T -> "#800080"
 
-let boardView state dispatch : IView =
-    let w, h = state.grid.width, state.grid.height
+let boardView state _ : IView =
+    let w, h = config.width, config.height
 
     let toColor state =
-        let cells = state.grid.board
+        let cells = state.board
 
         let minoPos =
             state.tetrimino.pos
@@ -62,7 +62,7 @@ let boardView state dispatch : IView =
         )
     ]
 
-let holdView (state: State) dispatch =
+let holdView (state: State) _ =
     StackPanel.create [
         StackPanel.orientation Orientation.Horizontal
         StackPanel.dock Dock.Top
@@ -111,9 +111,7 @@ let holdView (state: State) dispatch =
         ]
     ]
 
-
-
-let menuView state dispatch =
+let menuView state _ =
     StackPanel.create [
         StackPanel.orientation Orientation.Horizontal
         StackPanel.dock Dock.Top

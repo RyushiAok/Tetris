@@ -24,11 +24,22 @@ type Tetrimino = {
     shape: Shape
 }
 
+let config = {|
+    width = 16
+    height = 24
+    heightLimit = 3
+|}
+
 module TetrisBoard =
 
     let init () =
-        Array2D.init 24 16 (fun y x ->
-            if (3 <= x && x <= 12 && 0 <= y && y <= 21) then
+        Array2D.init config.height config.width (fun y x ->
+            if
+                (3 <= x
+                 && x <= config.width - 4
+                 && 0 <= y
+                 && y <= config.height - 3)
+            then
                 Cell.Empty
             else
                 Cell.Guard)
@@ -52,10 +63,11 @@ module TetrisBoard =
                 yield 22
                 for y in 21..-1..2 do
                     let isLineFilled =
-                        [ 3..12 ] |> List.forall (fun x -> isFilled x y nxt)
+                        [ 3 .. config.width - 4 ]
+                        |> List.forall (fun x -> isFilled x y nxt)
 
                     if isLineFilled then
-                        for x in 3..12 do
+                        for x in 3 .. config.width - 4 do
                             nxt[y, x] <- Empty
 
                         yield y
@@ -66,8 +78,8 @@ module TetrisBoard =
                 yield 0
             ]
 
-        for y in 21..-1..0 do
-            for x in 3..12 do
+        for y in config.height - 3 .. -1 .. 0 do
+            for x in 3 .. config.width - 4 do
                 nxt[dif[y], x] <- nxt[y, x]
 
         {| newBoard = nxt; eraced = dy |}
@@ -250,10 +262,9 @@ module Tetrimino =
             | _ -> [ (0, 0) ]
 
     let isHighLimitOver mino =
-        let highLimit = 3
 
         mino.pos
-        |> Array.exists (fun (_, y) -> mino.y + y <= highLimit)
+        |> Array.exists (fun (_, y) -> mino.y + y <= config.heightLimit)
 
     let existsOtherBlock board mino =
         mino.pos

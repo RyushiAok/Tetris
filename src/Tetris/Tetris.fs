@@ -3,16 +3,11 @@
 open Tetris.Core
 open System
 
-type Board = {
-    width: int
-    height: int
-    board: TetrisBoard
-}
 
 type State = {
     tetrimino: Tetrimino
     hold: Tetrimino option
-    grid: Board
+    board: TetrisBoard
     lastUpdated: DateTime
     isOver: bool
     score: int
@@ -43,16 +38,9 @@ let generateMinos =
 
         match queue with
         | [] ->
-            let b = blocks
-
-            for i in 0 .. blocks.Length - 1 do
-                let r = random.Next(0, blocks.Length)
-                let tmp = b[i]
-                b[i] <- b[r]
-                b[r] <- tmp
-
-            queue <- Array.toList b[1 .. b.Length - 1]
-            b[0]
+            blocks |> Array.sortInPlaceBy (fun _ -> random.Next(0, 100))
+            queue <- Array.toList blocks[1 .. blocks.Length - 1]
+            blocks[0]
         | h :: t ->
             queue <- t
             h
@@ -60,11 +48,7 @@ let generateMinos =
 let init () = {
     tetrimino = generateMinos true
     hold = None
-    grid = {
-        width = 16
-        height = 24
-        board = TetrisBoard.init ()
-    }
+    board = TetrisBoard.init ()
     lastUpdated = DateTime.Now
     isOver = false
     score = 0
@@ -80,7 +64,7 @@ let update msg state =
         then
             state
         else
-            let nxt = state.tetrimino |> Tetrimino.moveDown state.grid.board
+            let nxt = state.tetrimino |> Tetrimino.moveDown state.board
 
             if state.tetrimino <> nxt then
                 {
@@ -94,30 +78,27 @@ let update msg state =
                 |> function
                     | true ->
                         let existsOtherBlock =
-                            nxt |> Tetrimino.existsOtherBlock state.grid.board
+                            nxt |> Tetrimino.existsOtherBlock state.board
 
-                        let res = state.grid.board |> TetrisBoard.setTetrimino nxt
+                        let res = state.board |> TetrisBoard.setTetrimino nxt
 
                         {
                             state with
                                 isOver = true
-                                grid = {
-                                    state.grid with
-                                        board =
-                                            if existsOtherBlock then
-                                                state.grid.board
-                                            else
-                                                res.newBoard
-                                }
+                                board =
+                                    if existsOtherBlock then
+                                        state.board
+                                    else
+                                        res.newBoard
                         }
                     | false ->
                         let newMino = generateMinos false
 
-                        let res = state.grid.board |> TetrisBoard.setTetrimino nxt
+                        let res = state.board |> TetrisBoard.setTetrimino nxt
 
                         {
                             state with
-                                grid = { state.grid with board = res.newBoard }
+                                board = res.newBoard
                                 tetrimino = newMino
                                 lastUpdated = DateTime.Now
                                 isOver =
@@ -126,15 +107,15 @@ let update msg state =
                         }
     | RotL -> {
         state with
-            tetrimino = state.tetrimino |> Tetrimino.rotateLeft state.grid.board
+            tetrimino = state.tetrimino |> Tetrimino.rotateLeft state.board
             lastUpdated =
                 if
                     state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.rotateLeft state.grid.board = state.tetrimino
+                    || state.tetrimino |> Tetrimino.rotateLeft state.board = state.tetrimino
                     || state.tetrimino
-                       |> Tetrimino.rotateLeft state.grid.board
+                       |> Tetrimino.rotateLeft state.board
                        |> fun mino -> { mino with y = mino.y + 1 }
-                       |> Tetrimino.existsOtherBlock state.grid.board
+                       |> Tetrimino.existsOtherBlock state.board
                        |> not
                 then
                     state.lastUpdated
@@ -143,15 +124,15 @@ let update msg state =
       }
     | RotR -> {
         state with
-            tetrimino = state.tetrimino |> Tetrimino.rotateRight state.grid.board
+            tetrimino = state.tetrimino |> Tetrimino.rotateRight state.board
             lastUpdated =
                 if
                     state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.rotateRight state.grid.board = state.tetrimino
+                    || state.tetrimino |> Tetrimino.rotateRight state.board = state.tetrimino
                     || state.tetrimino
-                       |> Tetrimino.rotateRight state.grid.board
+                       |> Tetrimino.rotateRight state.board
                        |> fun mino -> { mino with y = mino.y + 1 }
-                       |> Tetrimino.existsOtherBlock state.grid.board
+                       |> Tetrimino.existsOtherBlock state.board
                        |> not
                 then
                     state.lastUpdated
@@ -160,13 +141,13 @@ let update msg state =
       }
     | Left -> {
         state with
-            tetrimino = state.tetrimino |> Tetrimino.moveLeft state.grid.board
+            tetrimino = state.tetrimino |> Tetrimino.moveLeft state.board
             lastUpdated =
                 if
                     state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.moveDown state.grid.board
+                    || state.tetrimino |> Tetrimino.moveDown state.board
                        <> state.tetrimino
-                    || state.tetrimino |> Tetrimino.moveLeft state.grid.board = state.tetrimino
+                    || state.tetrimino |> Tetrimino.moveLeft state.board = state.tetrimino
                 then
                     state.lastUpdated
                 else
@@ -174,13 +155,13 @@ let update msg state =
       }
     | Right -> {
         state with
-            tetrimino = state.tetrimino |> Tetrimino.moveRight state.grid.board
+            tetrimino = state.tetrimino |> Tetrimino.moveRight state.board
             lastUpdated =
                 if
                     state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.moveDown state.grid.board
+                    || state.tetrimino |> Tetrimino.moveDown state.board
                        <> state.tetrimino
-                    || state.tetrimino |> Tetrimino.moveRight state.grid.board = state.tetrimino
+                    || state.tetrimino |> Tetrimino.moveRight state.board = state.tetrimino
                 then
                     state.lastUpdated
                 else
@@ -188,7 +169,7 @@ let update msg state =
       }
     | Down -> {
         state with
-            tetrimino = state.tetrimino |> Tetrimino.moveDown state.grid.board
+            tetrimino = state.tetrimino |> Tetrimino.moveDown state.board
       }
     | Hold ->
         if state.hold.IsSome then
