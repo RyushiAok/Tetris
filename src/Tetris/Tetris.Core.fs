@@ -1,4 +1,4 @@
-module Tetris.Core
+﻿module Tetris.Core
 
 [<RequireQualifiedAccess>]
 type Shape =
@@ -77,13 +77,6 @@ module Tetrimino =
 
     let create (x, y) =
         function
-        | Shape.I -> {
-            x = x
-            y = y
-            shape = Shape.I
-            // 1 0 2 3
-            pos = [| (0, 0); (-1, 0); (1, 0); (2, 0) |]
-          }
         | Shape.O -> {
             x = x
             y = y
@@ -91,6 +84,14 @@ module Tetrimino =
             // 2 3
             // 0 1
             pos = [| (0, 0); (1, 0); (0, -1); (1, -1) |]
+          }
+        | Shape.T -> {
+            x = x
+            y = y
+            shape = Shape.T
+            // 1 0 2
+            //   3
+            pos = [| (0, 0); (-1, 0); (1, 0); (0, 1) |]
           }
         | Shape.S -> {
             x = x
@@ -108,14 +109,6 @@ module Tetrimino =
             //    0 3
             pos = [| (0, 0); (-1, -1); (0, -1); (1, 0) |]
           }
-        | Shape.J -> {
-            x = x
-            y = y
-            shape = Shape.J
-            // 3
-            // 2 0 1
-            pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |]
-          }
         | Shape.L -> {
             x = x
             y = y
@@ -124,13 +117,20 @@ module Tetrimino =
             // 2 0 1
             pos = [| (0, 0); (1, 0); (-1, 0); (1, -1) |]
           }
-        | Shape.T -> {
+        | Shape.J -> {
             x = x
             y = y
-            shape = Shape.T
-            // 1 0 2
-            //   3
-            pos = [| (0, 0); (-1, 0); (1, 0); (0, 1) |]
+            shape = Shape.J
+            // 3
+            // 2 0 1
+            pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |]
+          }
+        | Shape.I -> {
+            x = x
+            y = y
+            shape = Shape.I
+            // 3 2 0 1
+            pos = [| (0, 0); (1, 0); (-1, 0); (-2, 0) |]
           }
 
     [<RequireQualifiedAccess>]
@@ -149,31 +149,31 @@ module Tetrimino =
             | (1, 0) -> MinoTheta.``90``
             | (0, -1) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
+        | Shape.I ->
+            match mino.pos[1] with
+            | (1, 0) -> MinoTheta.``0``
+            | (0, -1) -> MinoTheta.``90``
+            | (-1, 0) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+        | Shape.Z ->
+            match mino.pos[3] with
+            | (1, 0) -> MinoTheta.``0``
+            | (0, -1) -> MinoTheta.``90``
+            | (-1, 0) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
+        | Shape.J ->
+            match mino.pos[1] with
+            | (1, 0) -> MinoTheta.``0``
+            | (0, -1) -> MinoTheta.``90``
+            | (-1, 0) -> MinoTheta.``180``
+            | _ -> MinoTheta.``270``
         | Shape.L ->
             match mino.pos[2] with
             | (-1, 0) -> MinoTheta.``0``
             | (0, 1) -> MinoTheta.``90``
             | (1, 0) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
-        | Shape.Z ->
-            match mino.pos[3] with
-            | (1, 0) -> MinoTheta.``0``
-            | (0, 1) -> MinoTheta.``90``
-            | (-1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-        | Shape.J ->
-            match mino.pos[1] with
-            | (1, 0) -> MinoTheta.``0``
-            | (0, 1) -> MinoTheta.``90``
-            | (-1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
         | Shape.S ->
-            match mino.pos[1] with
-            | (-1, 0) -> MinoTheta.``0``
-            | (0, -1) -> MinoTheta.``90``
-            | (1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-        | Shape.I ->
             match mino.pos[1] with
             | (-1, 0) -> MinoTheta.``0``
             | (0, 1) -> MinoTheta.``90``
@@ -182,6 +182,7 @@ module Tetrimino =
 
     let rightRotAsixs mino =
         match mino.shape with
+        | Shape.O -> [ (0, 0) ]
         | Shape.T ->
             match getTheta mino with
             | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (-1, 1); (-1, 2) ]
@@ -190,12 +191,12 @@ module Tetrimino =
             | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
         | Shape.S ->
             match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos[0]; (0, 1) ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; (0, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
             match getTheta mino with
             | MinoTheta.``0`` -> [ mino.pos[0]; (-1, 1) ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
             | _ -> [ (0, 0) ]
         | Shape.L ->
             match getTheta mino with
@@ -205,18 +206,18 @@ module Tetrimino =
             | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
         | Shape.J ->
             match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
         | Shape.I ->
             match getTheta mino with
             | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3] ]
             | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
-        | _ -> [ (0, 0) ]
 
 
     let leftRotAsixs mino =
         match mino.shape with
+        | Shape.O -> [ (0, 0) ]
         | Shape.T ->
             match getTheta mino with
             | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (1, 1); (1, 2) ]
@@ -226,11 +227,11 @@ module Tetrimino =
         | Shape.S ->
             match getTheta mino with
             | MinoTheta.``0`` -> [ mino.pos[0]; (1, 1) ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
             match getTheta mino with
-            | MinoTheta.``270`` -> [ mino.pos[0]; (0, 1) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; (0, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.L ->
             match getTheta mino with
@@ -239,15 +240,14 @@ module Tetrimino =
         | Shape.J ->
             match getTheta mino with
             | MinoTheta.``0`` -> [ (0, 0) ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; (1, 0) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[2] ]
             | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1]; (1, 1) ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[2] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; (1, 0) ]
         | Shape.I ->
             match getTheta mino with
             | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
             | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[3] ]
             | _ -> [ (0, 0) ]
-        | _ -> [ (0, 0) ]
 
     let isHighLimitOver mino =
         let highLimit = 3
