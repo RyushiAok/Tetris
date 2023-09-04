@@ -11,12 +11,11 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.8" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.8" />
-    <PackageReference Include="JaggerJo.Avalonia.FuncUI" Version="0.5.0-beta" />
-    <PackageReference Include="JaggerJo.Avalonia.FuncUI.DSL" Version="0.5.0-beta" />
-    <PackageReference Include="JaggerJo.Avalonia.FuncUI.Elmish" Version="0.5.0-beta" />
+  <ItemGroup> 
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.4" /> 
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" /> 
+    <PackageReference Include="Avalonia.FuncUI" Version="1.0.1" />
+    <PackageReference Include="Avalonia.FuncUI.Elmish" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
