@@ -1,4 +1,4 @@
-﻿module Tetris.Core
+module Tetris.Core
 
 [<RequireQualifiedAccess>]
 type Shape =
@@ -169,8 +169,8 @@ module Tetrimino =
             | _ -> MinoTheta.``270``
         | Shape.S ->
             match mino.pos[1] with
-            | (0, -1) -> MinoTheta.``0``
-            | (0, 1) -> MinoTheta.``90``
+            | (-1, 0) -> MinoTheta.``0``
+            | (0, -1) -> MinoTheta.``90``
             | (1, 0) -> MinoTheta.``180``
             | _ -> MinoTheta.``270``
         | Shape.I ->
@@ -190,7 +190,7 @@ module Tetrimino =
             | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
         | Shape.S ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; (0, 1) ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; (0, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
             match getTheta mino with
@@ -224,7 +224,8 @@ module Tetrimino =
             | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[2] ]
         | Shape.S ->
             match getTheta mino with
-            | MinoTheta.``270`` -> [ mino.pos[0]; (1, 1) ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; (1, 1) ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
             match getTheta mino with
