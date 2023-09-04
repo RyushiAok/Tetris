@@ -209,8 +209,8 @@ module Tetrimino =
             | _ -> [ (0, 0) ]
         | Shape.I ->
             match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[1] ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
             | _ -> [ (0, 0) ]
         | _ -> [ (0, 0) ]
 
@@ -244,8 +244,8 @@ module Tetrimino =
             | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[2] ]
         | Shape.I ->
             match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
-            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
+            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[3] ]
             | _ -> [ (0, 0) ]
         | _ -> [ (0, 0) ]
 
