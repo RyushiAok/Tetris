@@ -3,8 +3,8 @@
 open Xunit
 open FsUnit.Xunit
 
-open Core
-open Core.Tetrimino
+open Tetris.Core
+open Tetris.Core.Tetrimino
 
 module TestRotation =
     let rotRightAsixs mino =

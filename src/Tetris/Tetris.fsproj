@@ -1,21 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="Tetris.Core.fs" />
     <Compile Include="Tetris.fs" />
+    <Compile Include="Tetris.View.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-
-  <ItemGroup> 
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.4" /> 
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" /> 
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.4" />
     <PackageReference Include="Avalonia.FuncUI" Version="1.0.1" />
     <PackageReference Include="Avalonia.FuncUI.Elmish" Version="1.0.1" />
   </ItemGroup>
-
 </Project>

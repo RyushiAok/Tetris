@@ -1,4 +1,4 @@
-﻿module Core
+﻿module Tetris.Core
 
 type Shape =
     | I
