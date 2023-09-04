@@ -46,7 +46,7 @@ module TestRotation =
         | Shape.T ->
             match mino.pos.[3] with
             | (0, 1) -> [ mino.pos.[0]; mino.pos.[3]; (1, 1); (1, 2) ]
-            | (-1, 0) -> [ mino.pos.[0]; mino.pos.[3] ]
+            | (-1, 0) -> [ mino.pos.[0]; mino.pos.[2] ]
             | (0, -1) -> [ mino.pos.[0]; mino.pos.[1] ]
             | _ -> [ mino.pos.[0]; mino.pos.[3] ] // (1,0)
         | Shape.S ->
@@ -91,7 +91,7 @@ module ``Rotate Right`` =
     [<Fact>]
     let ``rotateRight O`` () =
 
-        let o_0 = Tetrimino.initMino Shape.O
+        let o_0 = Tetrimino.create (7, 2) Shape.O
         let o_90 = rotRight o_0
         let o_180 = rotRight o_90
         let o_270 = rotRight o_180
@@ -113,7 +113,7 @@ module ``Rotate Right`` =
     [<Fact>]
     let ``rotateRight J`` () =
 
-        let j_0 = Tetrimino.initMino Shape.J
+        let j_0 = Tetrimino.create (7, 2) Shape.J
         let j_90 = rotRight j_0
         let j_180 = rotRight j_90
         let j_270 = rotRight j_180
@@ -134,7 +134,7 @@ module ``Rotate Right`` =
     [<Fact>]
     let ``rotateRight I`` () =
 
-        let i_0 = Tetrimino.initMino Shape.I
+        let i_0 = Tetrimino.create (7, 2) Shape.I
         let i_90 = rotRight i_0
         let i_180 = rotRight i_90
         let i_270 = rotRight i_180
@@ -156,7 +156,7 @@ module ``Rotate Right`` =
     [<Fact>]
     let ``rotateRight T`` () =
 
-        let t_0 = Tetrimino.initMino Shape.T
+        let t_0 = Tetrimino.create (7, 2) Shape.T
         let t_90 = rotRight t_0
         let t_180 = rotRight t_90
         let t_270 = rotRight t_180
@@ -177,7 +177,7 @@ module ``Rotate Right`` =
     [<Fact>]
     let ``rotateRight S`` () =
 
-        let s_0 = Tetrimino.initMino Shape.S
+        let s_0 = Tetrimino.create (7, 2) Shape.S
         let s_90 = rotRight s_0
         let s_180 = rotRight s_90
         let s_270 = rotRight s_180
@@ -198,7 +198,7 @@ module ``Rotate Right`` =
     [<Fact>]
     let ``rotateRight Z`` () =
 
-        let z_0 = Tetrimino.initMino Shape.Z
+        let z_0 = Tetrimino.create (7, 2) Shape.Z
         let z_90 = rotRight z_0
         let z_180 = rotRight z_90
         let z_270 = rotRight z_180
@@ -218,7 +218,7 @@ module ``Rotate Right`` =
     [<Fact>]
     let ``rotateRight L`` () =
 
-        let l_0 = Tetrimino.initMino Shape.L
+        let l_0 = Tetrimino.create (7, 2) Shape.L
         let l_90 = rotRight l_0
         let l_180 = rotRight l_90
         let l_270 = rotRight l_180
@@ -240,7 +240,7 @@ module ``Rotate Left`` =
     [<Fact>]
     let ``rotateLeft O`` () =
 
-        let o_0 = Tetrimino.initMino Shape.O
+        let o_0 = Tetrimino.create (7, 2) Shape.O
         let o_90 = rotLeft o_0
         let o_180 = rotLeft o_90
         let o_270 = rotLeft o_180
@@ -260,7 +260,7 @@ module ``Rotate Left`` =
     [<Fact>]
     let ``rotateLeft J`` () =
 
-        let j_0 = Tetrimino.initMino Shape.J
+        let j_0 = Tetrimino.create (7, 2) Shape.J
         let j_90 = rotLeft j_0
         let j_180 = rotLeft j_90
         let j_270 = rotLeft j_180
@@ -280,7 +280,7 @@ module ``Rotate Left`` =
     [<Fact>]
     let ``rotateLeft I`` () =
 
-        let i_0 = Tetrimino.initMino Shape.I
+        let i_0 = Tetrimino.create (7, 2) Shape.I
         let i_90 = rotLeft i_0
         let i_180 = rotLeft i_90
         let i_270 = rotLeft i_180
@@ -300,7 +300,7 @@ module ``Rotate Left`` =
     [<Fact>]
     let ``rotateLeft T`` () =
 
-        let t_0 = Tetrimino.initMino Shape.T
+        let t_0 = Tetrimino.create (7, 2) Shape.T
         let t_90 = rotLeft t_0
         let t_180 = rotLeft t_90
         let t_270 = rotLeft t_180
@@ -320,7 +320,7 @@ module ``Rotate Left`` =
     [<Fact>]
     let ``rotateLeft S`` () =
 
-        let s_0 = Tetrimino.initMino Shape.S
+        let s_0 = Tetrimino.create (7, 2) Shape.S
         let s_90 = rotLeft s_0
         let s_180 = rotLeft s_90
         let s_270 = rotLeft s_180
@@ -340,7 +340,7 @@ module ``Rotate Left`` =
     [<Fact>]
     let ``rotateLeft Z`` () =
 
-        let z_0 = Tetrimino.initMino Shape.Z
+        let z_0 = Tetrimino.create (7, 2) Shape.Z
         let z_90 = rotLeft z_0
         let z_180 = rotLeft z_90
         let z_270 = rotLeft z_180
@@ -360,7 +360,7 @@ module ``Rotate Left`` =
     [<Fact>]
     let ``rotateLeft L`` () =
 
-        let l_0 = Tetrimino.initMino Shape.L
+        let l_0 = Tetrimino.create (7, 2) Shape.L
         let l_90 = rotLeft l_0
         let l_180 = rotLeft l_90
         let l_270 = rotLeft l_180

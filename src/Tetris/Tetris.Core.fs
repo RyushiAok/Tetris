@@ -1,4 +1,4 @@
-module Tetris.Core
+﻿module Tetris.Core
 
 [<RequireQualifiedAccess>]
 type Shape =
@@ -221,7 +221,7 @@ module Tetrimino =
             | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (1, 1); (1, 2) ]
             | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
             | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
+            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[2] ]
         | Shape.S ->
             match getTheta mino with
             | MinoTheta.``270`` -> [ mino.pos[0]; (1, 1) ]
