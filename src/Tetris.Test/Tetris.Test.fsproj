@@ -4,11 +4,10 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="Tetrimino.fs" />
-    <Compile Include="Spin/Util.fs" />
-    <Compile Include="Spin/T_Spin.fs" />
-    <Compile Include="Spin\SZ_Spin.fs" />
+  <ItemGroup> 
+    <Compile Include="Util.fs" />
+    <Compile Include="T_Spin.fs" />
+    <Compile Include="SZ_Spin.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tetris\Tetris.fsproj" />
