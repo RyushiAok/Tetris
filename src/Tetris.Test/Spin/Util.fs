@@ -1,6 +1,7 @@
 module Spin.Util
 
 open Tetris.Core
+open System.Text
 
 let cell2int =
     Map [
@@ -38,6 +39,16 @@ let boardToIntMatrix (board: TetrisBoard) =
     board
     |> Array2D.map (fun v ->
         match v with
-        | Empty -> 0
-        | Guard -> 1
-        | Mino _ -> 2)
+        | Empty -> " "
+        | Guard -> "■"
+        | Mino _ -> "×")
+    |> fun res ->
+        let s = StringBuilder()
+
+        for y in 0 .. (Array2D.length1 res - 1) do
+            for x in 0 .. Array2D.length2 res - 1 do
+                s.Append(res[y, x]) |> ignore
+
+            s.AppendLine() |> ignore
+
+        s.ToString()

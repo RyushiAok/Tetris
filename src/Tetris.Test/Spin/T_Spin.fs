@@ -38,7 +38,7 @@ let ``T-Spin Mini 1`` () =
             [ t; t; 0; 0; 0; 0; 0; 0; 0; 0 ]
         ]
 
-    expectedBoard |> should equal actual
+    actual |> should equal expectedBoard
 
 
 [<Fact>]
@@ -73,7 +73,7 @@ let ``T-Spin Mini 2`` () =
             [ 0; t; 1; 1; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    expectedBoard |> should equal actual
+    actual |> should equal expectedBoard
 
 
 [<Fact>]
@@ -106,7 +106,7 @@ let ``T-Spin Double`` () =
             [ 1; 1; 1; 1; 0; 0; 1; 1; 1; 1 ]
         ]
 
-    expectedBoard |> should equal actual
+    actual |> should equal expectedBoard
 
 
 
@@ -145,7 +145,7 @@ let ``T-Spin NEO`` () =
             [ 0; 0; 0; t; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    expectedBoard |> should equal actual
+    actual |> should equal expectedBoard
 
 [<Fact>]
 let ``T-Spin FIN`` () =
@@ -182,9 +182,7 @@ let ``T-Spin FIN`` () =
             [ 0; 0; 0; t; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let expectedBoard = boardToIntMatrix expectedBoard
-    let actual = boardToIntMatrix actual
-    expectedBoard |> should equal actual
+    actual |> should equal expectedBoard
 
 
 [<Fact>]
@@ -221,4 +219,79 @@ let ``T-Spin ISO`` () =
             [ 0; 0; 0; t; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    expectedBoard |> should equal actual
+    actual |> should equal expectedBoard
+
+
+[<Fact>]
+let ``T-Spin Triple 1`` () =
+    let board =
+        createBoardMatrix [
+            //0  1  2  3  4  5  6  7  8  9
+            [ 0; 0; 0; 1; 1; 0; 0; 0; 0; 0 ]
+            [ 0; 0; 0; 0; 1; 1; 1; 1; 1; 1 ] // 3
+            [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
+            [ 1; 1; 0; 0; 1; 1; 1; 1; 1; 1 ]
+            [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
+        ]
+
+    let t_mino =
+        let x, y = 2, 3
+
+        Tetrimino.create (x + 3, 21 - y) Shape.T
+        |> Tetrimino.rotateRight board
+        |> Tetrimino.moveDown board
+
+
+    let actual =
+        TetrisBoard.setTetrimino t_mino board
+        |> fun res -> res.newBoard
+
+
+    let expectedBoard =
+        createBoardMatrix [
+            //0  1  2  3  4  5  6  7  8  9
+            [ 0; 0; 0; 1; 1; 0; 0; 0; 0; 0 ]
+            [ 0; 0; 0; 0; 1; 1; 1; 1; 1; 1 ] // 3
+        ]
+
+    actual |> should equal expectedBoard
+
+[<Fact>]
+let ``T-Spin Triple 2`` () =
+    let board =
+        createBoardMatrix [
+            //0  1  2  3  4  5  6  7  8  9
+            [ 0; 0; 0; 0; 0; 0; 0; 0; 0; 0 ] // 5
+            [ 1; 0; 0; 1; 1; 0; 0; 0; 0; 0 ] // 4
+            [ 1; 0; 0; 0; 1; 1; 1; 1; 1; 1 ]
+            [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
+            [ 1; 1; 0; 0; 1; 1; 1; 1; 1; 1 ]
+            [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
+        ]
+
+    let t_mino =
+        let x, y = 1, 5
+
+        Tetrimino.create (x + 3, 21 - y) Shape.T
+        |> Tetrimino.rotateLeft board
+        |> Tetrimino.moveDown board
+        |> Tetrimino.rotateLeft board
+        |> Tetrimino.rotateLeft board
+
+    // |> Tetrimino.rotateLeft board
+
+
+    let actual =
+        TetrisBoard.setTetrimino t_mino board
+        |> fun res -> res.newBoard
+
+
+    let expectedBoard =
+        createBoardMatrix [
+            //0  1  2  3  4  5  6  7  8  9
+            [ 0; 0; 0; 0; 0; 0; 0; 0; 0; 0 ] // 6
+            [ 1; 0; 0; 1; 1; 0; 0; 0; 0; 0 ] // 5
+            [ 1; 0; 0; 0; 1; 1; 1; 1; 1; 1 ]
+        ]
+
+    actual |> should equal expectedBoard
