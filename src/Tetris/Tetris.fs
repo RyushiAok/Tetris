@@ -1,11 +1,15 @@
-﻿namespace Tetris
+﻿module Tetris
+
+open Core
 
 open System
 open Avalonia.FuncUI.DSL
-open Avalonia.Controls
-open Avalonia.Layout
-open Avalonia.Controls.Primitives
 open Avalonia.FuncUI.Helpers
+open Avalonia.FuncUI.Types
+open Avalonia.Controls
+open Avalonia.Controls.Primitives
+open Avalonia.Layout
+
 
 type Board = {
     width: int
@@ -14,6 +18,7 @@ type Board = {
 }
 
 module Game =
+
     type State = {
         tetrimino: Tetrimino
         hold: Tetrimino option
@@ -184,6 +189,9 @@ module Game =
         | NewGame -> init ()
         | _ -> state
 
+module View =
+    open Game
+
     let shapeToColor shape =
         match shape with
         | Shape.I -> "#00ffff"
@@ -194,7 +202,7 @@ module Game =
         | Shape.Z -> "#ff0000"
         | Shape.T -> "#800080"
 
-    let boardView state dispatch =
+    let boardView state dispatch : IView =
         let w, h = state.grid.width, state.grid.height
 
         let toColor state =

@@ -1,14 +1,13 @@
-﻿namespace Tetris
-
+﻿open Tetris
 open System
-open Elmish
 open Avalonia
-open Avalonia.Controls.ApplicationLifetimes
-open Avalonia.Input
-open Avalonia.FuncUI
+open Elmish
+open Avalonia.FuncUI.Hosts
 open Avalonia.FuncUI.Elmish
-open Avalonia.FuncUI.Components.Hosts
+open Avalonia.Controls.ApplicationLifetimes
+open Avalonia.Themes.Fluent
 open Avalonia.Threading
+open Avalonia.Input
 
 type MainWindow() as this =
     inherit HostWindow()
@@ -18,9 +17,16 @@ type MainWindow() as this =
         base.Width <- 450.0
         base.Height <- 600.0
 
-        let keyDownHandler (_state: Game.State) =
-            let sub dispatch =
-                this.KeyDown.Add(fun eventArgs ->
+        let subscriptions (_state: Game.State) =
+            let timerSub (dispatch: Game.Msg -> unit) =
+                let invoke () =
+                    Game.Update |> dispatch
+                    true
+
+                DispatcherTimer.Run(Func<bool>(invoke), TimeSpan.FromMilliseconds 10.0)
+
+            let keyDownSub (dispatch: Game.Msg -> unit) =
+                this.KeyDown.Subscribe(fun eventArgs ->
                     match eventArgs.Key with
                     | Key.RightShift -> Game.Msg.RotL
                     | Key.LeftShift -> Game.Msg.RotL
@@ -31,29 +37,12 @@ type MainWindow() as this =
                     | Key.E -> Game.Msg.Hold
                     | _ -> Game.Msg.Empty
                     |> dispatch)
-                |> ignore
 
-            Cmd.ofSub sub
+            [ [ nameof timerSub ], timerSub; [ nameof keyDownSub ], keyDownSub ]
 
-
-        let timer (_state: Game.State) =
-            let sub dispatch =
-                let invoke () =
-                    Game.Update |> dispatch
-                    true
-
-                DispatcherTimer.Run(
-                    Func<_>(invoke),
-                    TimeSpan.FromMilliseconds 10.0
-                )
-                |> ignore
-
-            Cmd.ofSub sub
-
-        Elmish.Program.mkSimple (fun () -> Game.init ()) Game.update Game.view
+        Program.mkSimple Game.init Game.update View.view
         |> Program.withHost this
-        |> Program.withSubscription timer
-        |> Program.withSubscription keyDownHandler
+        |> Program.withSubscription subscriptions
         |> Program.run
 
 
@@ -61,10 +50,8 @@ type App() =
     inherit Application()
 
     override this.Initialize() =
-        this.Styles.Load "avares://Avalonia.Themes.Default/DefaultTheme.xaml"
-
-        this.Styles.Load
-            "avares://Avalonia.Themes.Default/Accents/BaseDark.xaml"
+        this.Styles.Add(FluentTheme())
+        this.RequestedThemeVariant <- Styling.ThemeVariant.Dark
 
     override this.OnFrameworkInitializationCompleted() =
         match this.ApplicationLifetime with

@@ -1,4 +1,4 @@
-﻿namespace Tetris
+﻿module Core
 
 type Shape =
     | I
