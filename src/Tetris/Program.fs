@@ -28,7 +28,7 @@ type MainWindow() as this =
             let keyDownSub (dispatch: Game.Msg -> unit) =
                 this.KeyDown.Subscribe(fun eventArgs ->
                     match eventArgs.Key with
-                    | Key.RightShift -> Game.Msg.RotR
+                    | Key.RightShift
                     | Key.LeftShift -> Game.Msg.RotL
                     | Key.Space -> Game.Msg.RotR
                     | Key.S -> Game.Msg.Down

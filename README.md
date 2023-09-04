@@ -16,7 +16,7 @@ dotnet run --project Tetris
 | **F** | Move Left |
 | **A** | Move Right |
 | **S** | Move Down |
-| **Left Shift** | Rotate Left |
+| **Shift** | Rotate Left |
 | **Space** | Rotate Right |
 | **E** | Hold |
 
