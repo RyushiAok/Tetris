@@ -35,7 +35,7 @@ let createBoardMatrix (initBoard: int list list) =
 
     board
 
-let boardToIntMatrix (board: TetrisBoard) =
+let board2String (board: TetrisBoard) =
     board
     |> Array2D.map (fun v ->
         match v with
