@@ -172,17 +172,16 @@ let update msg state =
             tetrimino = state.tetrimino |> Tetrimino.moveDown state.board
       }
     | Hold ->
-        if state.hold.IsSome then
-            {
-                state with
-                    tetrimino = state.hold.Value
-                    hold = Some(Tetrimino.create (7, 2) state.tetrimino.shape)
-            }
-        else
-            {
-                state with
-                    tetrimino = generateMinos false
-                    hold = Some(Tetrimino.create (7, 2) state.tetrimino.shape)
-            }
+        match state.hold with
+        | Some holdMino -> {
+            state with
+                tetrimino = holdMino
+                hold = Some(Tetrimino.create (7, 2) state.tetrimino.shape)
+          }
+        | None -> {
+            state with
+                tetrimino = generateMinos false
+                hold = Some(Tetrimino.create (7, 2) state.tetrimino.shape)
+          }
     | NewGame -> init ()
     | _ -> state

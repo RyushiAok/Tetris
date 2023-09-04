@@ -17,10 +17,44 @@ type Cell =
 
 type TetrisBoard = Cell[,]
 
+[<RequireQualifiedAccess>]
+type Theta =
+    | ``0``
+    | ``90``
+    | ``180``
+    | ``270``
+
+type Position = { XYs: (int * int)[]; theta: Theta }
+
+module private Position =
+    let private rotateRightTheta =
+        function
+        | Theta.``0`` -> Theta.``270``
+        | Theta.``90`` -> Theta.``0``
+        | Theta.``180`` -> Theta.``90``
+        | Theta.``270`` -> Theta.``180``
+
+    let private rotateLeftTheta =
+        function
+        | Theta.``0`` -> Theta.``90``
+        | Theta.``90`` -> Theta.``180``
+        | Theta.``180`` -> Theta.``270``
+        | Theta.``270`` -> Theta.``0``
+
+    let rotateRight position = {
+        theta = rotateRightTheta position.theta
+        XYs = position.XYs |> Array.map (fun (x, y) -> (-y, x))
+    }
+
+    let rotateLeft position = {
+        theta = rotateLeftTheta position.theta
+        XYs = position.XYs |> Array.map (fun (x, y) -> (y, -x))
+    }
+
 type Tetrimino = {
     x: int
     y: int
-    pos: (int * int)[]
+    pos: Position
     shape: Shape
 }
 
@@ -40,9 +74,9 @@ module TetrisBoard =
                  && 0 <= y
                  && y <= config.height - 3)
             then
-                Cell.Empty
+                Empty
             else
-                Cell.Guard)
+                Guard)
 
     let isFilled x y (board: TetrisBoard) =
         match board[y, x] with
@@ -50,10 +84,14 @@ module TetrisBoard =
         | _ -> true
 
     let setTetrimino mino board =
-        let nxt = board |> Array2D.copy
+        let nxt =
+            let nxt = board |> Array2D.copy
 
-        mino.pos
-        |> Array.iter (fun (dx, dy) -> nxt[mino.y + dy, mino.x + dx] <- Mino mino.shape)
+            mino.pos.XYs
+            |> Array.iter (fun (dx, dy) ->
+                nxt[mino.y + dy, mino.x + dx] <- Mino mino.shape)
+
+            nxt
 
         let mutable dy = 0
 
@@ -95,7 +133,10 @@ module Tetrimino =
             shape = Shape.O
             // 2 3
             // 0 1
-            pos = [| (0, 0); (1, 0); (0, -1); (1, -1) |]
+            pos = {
+                theta = Theta.``0``
+                XYs = [| (0, 0); (1, 0); (0, -1); (1, -1) |]
+            }
           }
         | Shape.T -> {
             x = x
@@ -103,7 +144,10 @@ module Tetrimino =
             shape = Shape.T
             // 1 0 2
             //   3
-            pos = [| (0, 0); (-1, 0); (1, 0); (0, 1) |]
+            pos = {
+                theta = Theta.``0``
+                XYs = [| (0, 0); (-1, 0); (1, 0); (0, 1) |]
+            }
           }
         | Shape.S -> {
             x = x
@@ -111,7 +155,10 @@ module Tetrimino =
             shape = Shape.S
             //   2 3
             // 1 0
-            pos = [| (0, 0); (-1, 0); (0, -1); (1, -1) |]
+            pos = {
+                theta = Theta.``0``
+                XYs = [| (0, 0); (-1, 0); (0, -1); (1, -1) |]
+            }
           }
         | Shape.Z -> {
             x = x
@@ -119,7 +166,10 @@ module Tetrimino =
             shape = Shape.Z
             //  1 2
             //    0 3
-            pos = [| (0, 0); (-1, -1); (0, -1); (1, 0) |]
+            pos = {
+                theta = Theta.``0``
+                XYs = [| (0, 0); (-1, -1); (0, -1); (1, 0) |]
+            }
           }
         | Shape.L -> {
             x = x
@@ -127,7 +177,10 @@ module Tetrimino =
             shape = Shape.L
             //     3
             // 2 0 1
-            pos = [| (0, 0); (1, 0); (-1, 0); (1, -1) |]
+            pos = {
+                theta = Theta.``0``
+                XYs = [| (0, 0); (1, 0); (-1, 0); (1, -1) |]
+            }
           }
         | Shape.J -> {
             x = x
@@ -135,139 +188,97 @@ module Tetrimino =
             shape = Shape.J
             // 3
             // 2 0 1
-            pos = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |]
+            pos = {
+                theta = Theta.``0``
+                XYs = [| (0, 0); (1, 0); (-1, 0); (-1, -1) |]
+            }
           }
         | Shape.I -> {
             x = x
             y = y
             shape = Shape.I
             // 3 2 0 1
-            pos = [| (0, 0); (1, 0); (-1, 0); (-2, 0) |]
+            pos = {
+                theta = Theta.``0``
+                XYs = [| (0, 0); (1, 0); (-1, 0); (-2, 0) |]
+            }
           }
 
-    [<RequireQualifiedAccess>]
-    type MinoTheta =
-        | ``0``
-        | ``90``
-        | ``180``
-        | ``270``
-
-    let private getTheta mino =
-        match mino.shape with
-        | Shape.O -> MinoTheta.``0``
-        | Shape.T ->
-            match mino.pos[3] with
-            | (0, 1) -> MinoTheta.``0``
-            | (1, 0) -> MinoTheta.``90``
-            | (0, -1) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-        | Shape.I ->
-            match mino.pos[1] with
-            | (1, 0) -> MinoTheta.``0``
-            | (0, -1) -> MinoTheta.``90``
-            | (-1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-        | Shape.Z ->
-            match mino.pos[3] with
-            | (1, 0) -> MinoTheta.``0``
-            | (0, -1) -> MinoTheta.``90``
-            | (-1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-        | Shape.J ->
-            match mino.pos[1] with
-            | (1, 0) -> MinoTheta.``0``
-            | (0, -1) -> MinoTheta.``90``
-            | (-1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-        | Shape.L ->
-            match mino.pos[2] with
-            | (-1, 0) -> MinoTheta.``0``
-            | (0, 1) -> MinoTheta.``90``
-            | (1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-        | Shape.S ->
-            match mino.pos[1] with
-            | (-1, 0) -> MinoTheta.``0``
-            | (0, 1) -> MinoTheta.``90``
-            | (1, 0) -> MinoTheta.``180``
-            | _ -> MinoTheta.``270``
-
-    let rightRotAsixs mino =
+    let private rightRotAsixs mino =
         match mino.shape with
         | Shape.O -> [ (0, 0) ]
         | Shape.T ->
-            match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (-1, 1); (-1, 2) ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
-            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[2] ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
+            match mino.pos.theta with
+            | Theta.``0`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3]; (-1, 1); (-1, 2) ]
+            | Theta.``90`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3] ]
+            | Theta.``180`` -> [ mino.pos.XYs[0]; mino.pos.XYs[2] ]
+            | Theta.``270`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3] ]
         | Shape.S ->
-            match getTheta mino with
-            | MinoTheta.``270`` -> [ mino.pos[0]; (0, 1) ]
+            match mino.pos.theta with
+            | Theta.``270`` -> [ mino.pos.XYs[0]; (0, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
-            match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; (-1, 1) ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[3] ]
+            match mino.pos.theta with
+            | Theta.``0`` -> [ mino.pos.XYs[0]; (-1, 1) ]
+            | Theta.``270`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3] ]
             | _ -> [ (0, 0) ]
         | Shape.L ->
-            match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[2] ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; (-1, 0) ]
-            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[2]; (-1, 1) ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
+            match mino.pos.theta with
+            | Theta.``0`` -> [ mino.pos.XYs[0]; mino.pos.XYs[2] ]
+            | Theta.``90`` -> [ mino.pos.XYs[0]; (-1, 0) ]
+            | Theta.``180`` -> [ mino.pos.XYs[0]; mino.pos.XYs[2]; (-1, 1) ]
+            | Theta.``270`` -> [ mino.pos.XYs[0]; mino.pos.XYs[1] ]
         | Shape.J ->
-            match getTheta mino with
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
+            match mino.pos.theta with
+            | Theta.``270`` -> [ mino.pos.XYs[0]; mino.pos.XYs[1] ]
             | _ -> [ (0, 0) ]
         | Shape.I ->
-            match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3] ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[1] ]
+            match mino.pos.theta with
+            | Theta.``0`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3] ]
+            | Theta.``270`` -> [ mino.pos.XYs[0]; mino.pos.XYs[1] ]
             | _ -> [ (0, 0) ]
 
 
-    let leftRotAsixs mino =
+    let private leftRotAsixs mino =
         match mino.shape with
         | Shape.O -> [ (0, 0) ]
         | Shape.T ->
-            match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; mino.pos[3]; (1, 1); (1, 2) ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
-            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1] ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; mino.pos[2] ]
+            match mino.pos.theta with
+            | Theta.``0`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3]; (1, 1); (1, 2) ]
+            | Theta.``90`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3] ]
+            | Theta.``180`` -> [ mino.pos.XYs[0]; mino.pos.XYs[1] ]
+            | Theta.``270`` -> [ mino.pos.XYs[0]; mino.pos.XYs[2] ]
         | Shape.S ->
-            match getTheta mino with
-            | MinoTheta.``0`` -> [ mino.pos[0]; (1, 1) ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[1] ]
+            match mino.pos.theta with
+            | Theta.``0`` -> [ mino.pos.XYs[0]; (1, 1) ]
+            | Theta.``90`` -> [ mino.pos.XYs[0]; mino.pos.XYs[1] ]
             | _ -> [ (0, 0) ]
         | Shape.Z ->
-            match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos[0]; (0, 1) ]
+            match mino.pos.theta with
+            | Theta.``90`` -> [ mino.pos.XYs[0]; (0, 1) ]
             | _ -> [ (0, 0) ]
         | Shape.L ->
-            match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[2] ]
+            match mino.pos.theta with
+            | Theta.``90`` -> [ mino.pos.XYs[0]; mino.pos.XYs[2] ]
             | _ -> [ (0, 0) ]
         | Shape.J ->
-            match getTheta mino with
-            | MinoTheta.``0`` -> [ (0, 0) ]
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[2] ]
-            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[1]; (1, 1) ]
-            | MinoTheta.``270`` -> [ mino.pos[0]; (1, 0) ]
+            match mino.pos.theta with
+            | Theta.``0`` -> [ (0, 0) ]
+            | Theta.``90`` -> [ mino.pos.XYs[0]; mino.pos.XYs[2] ]
+            | Theta.``180`` -> [ mino.pos.XYs[0]; mino.pos.XYs[1]; (1, 1) ]
+            | Theta.``270`` -> [ mino.pos.XYs[0]; (1, 0) ]
         | Shape.I ->
-            match getTheta mino with
-            | MinoTheta.``90`` -> [ mino.pos[0]; mino.pos[3] ]
-            | MinoTheta.``180`` -> [ mino.pos[0]; mino.pos[3] ]
+            match mino.pos.theta with
+            | Theta.``90`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3] ]
+            | Theta.``180`` -> [ mino.pos.XYs[0]; mino.pos.XYs[3] ]
             | _ -> [ (0, 0) ]
 
     let isHighLimitOver mino =
-
-        mino.pos
+        mino.pos.XYs
         |> Array.exists (fun (_, y) -> mino.y + y <= config.heightLimit)
 
     let existsOtherBlock board mino =
-        mino.pos
+        mino.pos.XYs
         |> Array.exists (fun (dx, dy) ->
             board |> TetrisBoard.isFilled (mino.x + dx) (mino.y + dy))
 
@@ -295,12 +306,11 @@ module Tetrimino =
         tryShift Left board mino |> Option.defaultValue mino
 
     let rotateRight board mino =
-        if mino.shape = Shape.O then
-            mino
-        else
-            let pos = [| for (dx, dy) in mino.pos -> (-dy, dx) |]
-
-            let r_asixs = rightRotAsixs mino
+        match mino.shape with
+        | Shape.O -> mino
+        | _ ->
+            let pos = mino.pos |> Position.rotateRight
+            let asixs = rightRotAsixs mino
 
             let rec loop =
                 function
@@ -313,14 +323,14 @@ module Tetrimino =
                             let cx, cy = mino.x + hx + hy, mino.y + hy - hx
                             let nx, ny = cx + mx, cy + my
 
-                            pos
+                            pos.XYs
                             |> Array.exists (fun (dx, dy) ->
                                 board |> TetrisBoard.isFilled (nx + dx) (ny + dy))
                             |> function
                                 | true -> loop2 t2
                                 | false -> { mino with x = nx; y = ny; pos = pos }
 
-                    loop2 r_asixs
+                    loop2 asixs
 
             let moved =
                 loop [
@@ -335,24 +345,23 @@ module Tetrimino =
                     (0, 2)
                 ]
 
-            let modify = // adjust mino's height
+            let adjustedMino =
                 if moved.y < mino.y then { moved with y = moved.y + 1 }
                 elif moved.y > mino.y then { moved with y = moved.y - 1 }
                 else moved
 
-            modify
+            adjustedMino
             |> existsOtherBlock board
             |> function
-                | false -> modify
+                | false -> adjustedMino
                 | true -> moved
 
     let rotateLeft board mino =
-        if mino.shape = Shape.O then
-            mino
-        else
-            let pos = [| for (dx, dy) in mino.pos -> (dy, -dx) |]
-
-            let r_asixs = leftRotAsixs mino
+        match mino.shape with
+        | Shape.O -> mino
+        | _ ->
+            let pos = mino.pos |> Position.rotateLeft
+            let asixs = leftRotAsixs mino
 
             let rec loop =
                 function
@@ -365,14 +374,14 @@ module Tetrimino =
                             let cx, cy = mino.x + hx - hy, mino.y + hy + hx
                             let nx, ny = cx + mx, cy + my
 
-                            pos
+                            pos.XYs
                             |> Array.exists (fun (dx, dy) ->
                                 board |> TetrisBoard.isFilled (nx + dx) (ny + dy))
                             |> function
-                                | false -> { mino with x = nx; y = ny; pos = pos }
                                 | true -> loop2 t2
+                                | false -> { mino with x = nx; y = ny; pos = pos }
 
-                    loop2 r_asixs
+                    loop2 asixs
 
             let moved =
                 loop [
@@ -387,13 +396,13 @@ module Tetrimino =
                     (0, 2)
                 ]
 
-            let modified =
+            let adjustedMino =
                 if moved.y < mino.y then { moved with y = moved.y + 1 }
                 elif moved.y > mino.y then { moved with y = moved.y - 1 }
                 else moved
 
-            modified
+            adjustedMino
             |> existsOtherBlock board
             |> function
-                | false -> modified
+                | false -> adjustedMino
                 | true -> moved

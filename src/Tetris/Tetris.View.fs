@@ -27,7 +27,7 @@ let boardView state _ : IView =
         let cells = state.board
 
         let minoPos =
-            state.tetrimino.pos
+            state.tetrimino.pos.XYs
             |> Array.map (fun (x, y) -> (x + state.tetrimino.x, y + state.tetrimino.y))
 
         let minoShape = state.tetrimino.shape
@@ -80,14 +80,19 @@ let holdView (state: State) _ =
                     state.hold
                     |> Option.map (fun mino -> {
                         mino with
-                            pos = mino.pos |> Array.map (fun (a, b) -> (a + 1, b + 1))
+                            pos = {
+                                mino.pos with
+                                    XYs =
+                                        mino.pos.XYs
+                                        |> Array.map (fun (a, b) -> (a + 2, b + 1))
+                            }
                     })
                     |> Option.map (fun mino -> [|
                         for y in 0..3 do
                             for x in 0..3 do
                                 if
                                     not state.isOver
-                                    && mino.pos |> Array.contains (x, y)
+                                    && mino.pos.XYs |> Array.contains (x, y)
                                 then
                                     yield shapeToColor mino.shape
                                 else
