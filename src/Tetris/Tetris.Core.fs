@@ -60,19 +60,18 @@ type Tetrimino = {
 
 let config = {|
     width = 16
-    height = 24
-    heightLimit = 3
+    height = 26
+    heightLimit = 2
 |}
 
 module TetrisBoard =
-
     let init () =
         Array2D.init config.height config.width (fun y x ->
             if
                 (3 <= x
                  && x <= config.width - 4
                  && 0 <= y
-                 && y <= config.height - 3)
+                 && y <= config.height - 4)
             then
                 Empty
             else
@@ -97,9 +96,8 @@ module TetrisBoard =
 
         let dif =
             List.rev [
-                yield 23
-                yield 22
-                for y in 21..-1..2 do
+                yield! [ config.height - 1 .. - 1 .. config.height - 3 ]
+                for y in config.height - 4 .. -1 .. 2 do
                     let isLineFilled =
                         [ 3 .. config.width - 4 ]
                         |> List.forall (fun x -> isFilled x y nxt)
@@ -116,7 +114,7 @@ module TetrisBoard =
                 yield 0
             ]
 
-        for y in config.height - 3 .. -1 .. 0 do
+        for y in config.height - 4 .. -1 .. 0 do
             for x in 3 .. config.width - 4 do
                 nxt[dif[y], x] <- nxt[y, x]
 

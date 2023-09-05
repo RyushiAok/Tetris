@@ -33,8 +33,8 @@ let boardView state _ : IView =
         let minoShape = state.tetrimino.shape
 
         [|
-            for y in 3 .. (Array2D.length1 cells) - 1 - 1 do
-                for x in 2 .. (Array2D.length2 cells) - 1 - 2 do
+            for y in 3 .. (Array2D.length1 cells) - 3 do
+                for x in 2 .. (Array2D.length2 cells) - 3 do
                     if not state.isOver && minoPos |> Array.contains (x, y) then
                         yield shapeToColor minoShape
                     else
@@ -44,17 +44,19 @@ let boardView state _ : IView =
                         | Cell.Mino shape -> yield shapeToColor shape
         |]
 
+    let cellSize = 24.0
+
     UniformGrid.create [
         UniformGrid.columns (w - 4)
         UniformGrid.rows (h - 4)
-        UniformGrid.width 280.0
-        UniformGrid.height 480.0
+        UniformGrid.width (cellSize * float (w - 4))
+        UniformGrid.height (cellSize * float (h - 4))
         UniformGrid.children (
             state
             |> toColor
             |> Array.map (fun (color: string) ->
                 Border.create [
-                    Border.padding 0.8
+                    Border.padding 1
                     Border.child (Border.create [ Border.background color ])
                 ]
                 |> generalize)
