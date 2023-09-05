@@ -16,17 +16,17 @@ let ``T-Spin Mini 1`` () =
             [ 0; 1; 1; 1; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 1, 2
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateRight board
         |> Tetrimino.rotateRight board
         |> Tetrimino.moveDown board
         |> Tetrimino.rotateRight board
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -50,17 +50,17 @@ let ``T-Spin Mini 2`` () =
             [ 0; 0; 0; 1; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 1, 2
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateLeft board
         |> Tetrimino.moveLeft board
         |> Tetrimino.moveDown board
         |> Tetrimino.rotateLeft board
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -86,18 +86,19 @@ let ``T-Spin Double`` () =
             [ 1; 1; 1; 1; 0; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 5, 3
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateRight board
         |> Tetrimino.moveDown board
         |> Tetrimino.rotateLeft board
 
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
+        |> board2String
 
 
     let expectedBoard =
@@ -105,6 +106,7 @@ let ``T-Spin Double`` () =
             [ 0; 0; 0; 0; 0; 0; 0; 0; 0; 0 ]
             [ 1; 1; 1; 1; 0; 0; 1; 1; 1; 1 ]
         ]
+        |> board2String
 
     actual |> should equal expectedBoard
 
@@ -122,16 +124,16 @@ let ``T-Spin NEO`` () =
             [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 3, 3
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateRight board
         |> Tetrimino.moveDown board
 
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -159,16 +161,16 @@ let ``T-Spin FIN`` () =
             [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 2, 3
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateRight board
         |> Tetrimino.moveDown board
 
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -197,15 +199,15 @@ let ``T-Spin ISO`` () =
             [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 3, 3
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateLeft board
 
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -234,16 +236,16 @@ let ``T-Spin Triple 1`` () =
             [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 2, 3
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateRight board
         |> Tetrimino.moveDown board
 
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -269,10 +271,10 @@ let ``T-Spin Triple 2`` () =
             [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 1, 5
 
-        Tetrimino.create (x + 3, 21 - y) Shape.T
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.T
         |> Tetrimino.rotateLeft board
         |> Tetrimino.moveDown board
         |> Tetrimino.rotateLeft board
@@ -282,7 +284,7 @@ let ``T-Spin Triple 2`` () =
 
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 

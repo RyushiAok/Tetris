@@ -31,7 +31,7 @@ let createBoardMatrix (initBoard: int list list) =
     |> List.rev
     |> List.iteri (fun y row ->
         row
-        |> List.iteri (fun x v -> board[21 - y, x + 3] <- int2cell[v]))
+        |> List.iteri (fun x v -> board[config.height - 4 - y, x + 3] <- int2cell[v]))
 
     board
 

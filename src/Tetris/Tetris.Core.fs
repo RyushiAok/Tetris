@@ -97,7 +97,7 @@ module TetrisBoard =
         let dif =
             List.rev [
                 yield! [ config.height - 1 .. - 1 .. config.height - 3 ]
-                for y in config.height - 4 .. -1 .. 2 do
+                for y in config.height - 4 .. -1 .. 0 do
                     let isLineFilled =
                         [ 3 .. config.width - 4 ]
                         |> List.forall (fun x -> isFilled x y nxt)
@@ -110,8 +110,6 @@ module TetrisBoard =
                         dy <- dy + 1
                     else
                         yield y + dy
-                yield 1
-                yield 0
             ]
 
         for y in config.height - 4 .. -1 .. 0 do

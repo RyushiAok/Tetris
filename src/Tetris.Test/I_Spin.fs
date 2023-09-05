@@ -20,15 +20,15 @@ let ``I-Spin 1`` () =
             [ 1; 1; 1; 0; 1; 1; 1; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 6, 3
 
-        Tetrimino.create (x + 3, 21 - y) Shape.I
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.I
         |> Tetrimino.moveLeft board
         |> Tetrimino.rotateRight board
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -56,16 +56,16 @@ let ``I-Spin 2`` () =
             [ 1; 1; 1; 1; 1; 1; 0; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 4, 3
 
-        Tetrimino.create (x + 3, 21 - y) Shape.I
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.I
         |> Tetrimino.rotateRight board
         |> Tetrimino.rotateRight board
         |> Tetrimino.rotateLeft board
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -94,10 +94,10 @@ let ``I-Spin 3`` () =
             [ 1; 1; 1; 0; 0; 0; 0; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 3, 4
 
-        Tetrimino.create (x + 3, 21 - y) Shape.I
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.I
         |> Tetrimino.rotateRight board
         |> Tetrimino.moveDown board
         |> Tetrimino.moveDown board
@@ -105,7 +105,7 @@ let ``I-Spin 3`` () =
         |> Tetrimino.rotateRight board
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
@@ -134,10 +134,10 @@ let ``I-Spin 4`` () =
             [ 1; 1; 1; 0; 0; 0; 0; 1; 1; 1 ]
         ]
 
-    let t_mino =
+    let mino =
         let x, y = 6, 4
 
-        Tetrimino.create (x + 3, 21 - y) Shape.I
+        Tetrimino.create (x + 3, config.height - 4 - y) Shape.I
         |> Tetrimino.rotateLeft board
         |> Tetrimino.moveDown board
         |> Tetrimino.moveDown board
@@ -145,7 +145,7 @@ let ``I-Spin 4`` () =
         |> Tetrimino.rotateLeft board
 
     let actual =
-        TetrisBoard.setTetrimino t_mino board
+        TetrisBoard.setTetrimino mino board
         |> fun res -> res.newBoard
 
 
