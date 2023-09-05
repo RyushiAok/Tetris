@@ -105,68 +105,78 @@ let update msg state =
                                     newMino |> Tetrimino.existsOtherBlock res.newBoard
                                 score = state.score + res.eraced
                         }
-    | RotL -> {
-        state with
-            tetrimino = state.tetrimino |> Tetrimino.rotateLeft state.board
-            lastUpdated =
-                if
-                    state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.rotateLeft state.board = state.tetrimino
-                    || state.tetrimino
-                       |> Tetrimino.rotateLeft state.board
-                       |> fun mino -> { mino with y = mino.y + 1 }
-                       |> Tetrimino.existsOtherBlock state.board
-                       |> not
-                then
-                    state.lastUpdated
-                else
-                    DateTime.Now
-      }
-    | RotR -> {
-        state with
-            tetrimino = state.tetrimino |> Tetrimino.rotateRight state.board
-            lastUpdated =
-                if
-                    state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.rotateRight state.board = state.tetrimino
-                    || state.tetrimino
-                       |> Tetrimino.rotateRight state.board
-                       |> fun mino -> { mino with y = mino.y + 1 }
-                       |> Tetrimino.existsOtherBlock state.board
-                       |> not
-                then
-                    state.lastUpdated
-                else
-                    DateTime.Now
-      }
-    | Left -> {
-        state with
-            tetrimino = state.tetrimino |> Tetrimino.moveLeft state.board
-            lastUpdated =
-                if
-                    state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.moveDown state.board
-                       <> state.tetrimino
-                    || state.tetrimino |> Tetrimino.moveLeft state.board = state.tetrimino
-                then
-                    state.lastUpdated
-                else
-                    DateTime.Now
-      }
-    | Right -> {
-        state with
-            tetrimino = state.tetrimino |> Tetrimino.moveRight state.board
-            lastUpdated =
-                if
-                    state.tetrimino.shape = Shape.O
-                    || state.tetrimino |> Tetrimino.moveDown state.board
-                       <> state.tetrimino
-                    || state.tetrimino |> Tetrimino.moveRight state.board = state.tetrimino
-                then
-                    state.lastUpdated
-                else
-                    DateTime.Now
-      }
+    | RotL ->
+        let nxt = state.tetrimino |> Tetrimino.rotateLeft state.board
+
+        {
+            state with
+                tetrimino = nxt
+                lastUpdated =
+                    if
+                        state.tetrimino.shape = Shape.O
+                        || nxt = state.tetrimino
+                        || nxt
+                           |> fun mino -> { mino with y = mino.y + 1 }
+                           |> Tetrimino.existsOtherBlock state.board
+                           |> not
+                    then
+                        state.lastUpdated
+                    else
+                        DateTime.Now
+        }
+    | RotR ->
+        let nxt = state.tetrimino |> Tetrimino.rotateRight state.board
+
+        {
+            state with
+                tetrimino = nxt
+                lastUpdated =
+                    if
+                        state.tetrimino.shape = Shape.O
+                        || nxt = state.tetrimino
+                        || nxt
+                           |> fun mino -> { mino with y = mino.y + 1 }
+                           |> Tetrimino.existsOtherBlock state.board
+                           |> not
+                    then
+                        state.lastUpdated
+                    else
+                        DateTime.Now
+        }
+    | Left ->
+        let nxt = state.tetrimino |> Tetrimino.moveLeft state.board
+
+        {
+            state with
+                tetrimino = nxt
+                lastUpdated =
+                    if
+                        state.tetrimino.shape = Shape.O
+                        || state.tetrimino |> Tetrimino.moveDown state.board
+                           <> state.tetrimino
+                        || nxt = state.tetrimino
+                    then
+                        state.lastUpdated
+                    else
+                        DateTime.Now
+        }
+    | Right ->
+        let nxt = state.tetrimino |> Tetrimino.moveRight state.board
+
+        {
+            state with
+                tetrimino = nxt
+                lastUpdated =
+                    if
+                        state.tetrimino.shape = Shape.O
+                        || state.tetrimino |> Tetrimino.moveDown state.board
+                           <> state.tetrimino
+                        || nxt = state.tetrimino
+                    then
+                        state.lastUpdated
+                    else
+                        DateTime.Now
+        }
     | Down -> {
         state with
             tetrimino = state.tetrimino |> Tetrimino.moveDown state.board
