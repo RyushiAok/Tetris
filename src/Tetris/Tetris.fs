@@ -115,10 +115,7 @@ let update msg state =
                     if
                         state.tetrimino.shape = Shape.O
                         || nxt = state.tetrimino
-                        || nxt
-                           |> fun mino -> { mino with y = mino.y + 1 }
-                           |> Tetrimino.existsOtherBlock state.board
-                           |> not
+                        || nxt |> Tetrimino.moveDown state.board <> nxt
                     then
                         state.lastUpdated
                     else
@@ -134,10 +131,7 @@ let update msg state =
                     if
                         state.tetrimino.shape = Shape.O
                         || nxt = state.tetrimino
-                        || nxt
-                           |> fun mino -> { mino with y = mino.y + 1 }
-                           |> Tetrimino.existsOtherBlock state.board
-                           |> not
+                        || nxt |> Tetrimino.moveDown state.board <> nxt
                     then
                         state.lastUpdated
                     else
@@ -152,9 +146,8 @@ let update msg state =
                 lastUpdated =
                     if
                         state.tetrimino.shape = Shape.O
-                        || state.tetrimino |> Tetrimino.moveDown state.board
-                           <> state.tetrimino
                         || nxt = state.tetrimino
+                        || nxt |> Tetrimino.moveDown state.board <> nxt
                     then
                         state.lastUpdated
                     else
@@ -169,9 +162,8 @@ let update msg state =
                 lastUpdated =
                     if
                         state.tetrimino.shape = Shape.O
-                        || state.tetrimino |> Tetrimino.moveDown state.board
-                           <> state.tetrimino
                         || nxt = state.tetrimino
+                        || nxt |> Tetrimino.moveDown state.board <> nxt
                     then
                         state.lastUpdated
                     else
