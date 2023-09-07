@@ -6,7 +6,7 @@
   <ItemGroup>
     <Compile Include="Tetris.Core.fs" />
     <Compile Include="Tetris.fs" />
-    <Compile Include="Tetris.View.fs" />
+    <Compile Include="View.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
