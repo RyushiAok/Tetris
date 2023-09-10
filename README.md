@@ -19,3 +19,12 @@ dotnet run --project Tetris
 | **Shift** | Rotate Left |
 | **Space** | Rotate Right |
 | **E** | Hold |
+
+## ⚙️ Algorithm
+### Special Spins
+Special spins are achieved by combining rotation around the candidate axis, determined by the tetrimino type, orientation, and rotation direction, with shift movements.
+
+<div align="center"> 
+  <img width=400 alt="Rotation around the candidate axis" src="https://github.com/RyushiAok/Tetris/assets/55625375/ce6e522a-b5fc-48af-9baf-4c6e3355a9cf" />
+  <div><strong>Rotation around the candidate axis</strong></div>
+</div>
