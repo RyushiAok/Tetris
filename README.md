@@ -1,7 +1,7 @@
 <div align="center"> 
-  <h3>💠🧩 F# Tetris 🧩💠</h3>
+  <h3>🧩 F# Tetris 🧩</h3>
   <br>
-  <img height=500 src="https://user-images.githubusercontent.com/55625375/137788918-202b78b3-86fa-48a2-998f-a1dfea28b002.gif" />
+  <img height=500 src="https://github.com/RyushiAok/Tetris/assets/55625375/c1bde67b-885d-4967-b69b-736600743bac" />
 </div>
 
 ## 🎈 How to play
@@ -19,4 +19,3 @@ dotnet run --project Tetris
 | **Shift** | Rotate Left |
 | **Space** | Rotate Right |
 | **E** | Hold |
-
