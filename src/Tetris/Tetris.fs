@@ -30,7 +30,7 @@ let generateMinos =
 
     let blocks =
         [| Shape.I; Shape.O; Shape.S; Shape.Z; Shape.J; Shape.L; Shape.T |]
-        |> Array.map (Tetrimino.create (7, 2))
+        |> Array.map (Tetrimino.create config.initialXY)
 
     fun reset ->
         if reset then
@@ -103,7 +103,7 @@ let update msg state =
                                 lastUpdated = DateTime.Now
                                 isOver =
                                     newMino |> Tetrimino.existsOtherBlock res.newBoard
-                                score = state.score + res.eraced
+                                score = state.score + res.clearedLines
                         }
     | RotL ->
         let nxt = state.tetrimino |> Tetrimino.rotateLeft state.board
@@ -179,7 +179,7 @@ let update msg state =
                 match state.hold with
                 | Some holdMino -> holdMino
                 | None -> generateMinos false
-            hold = Some(Tetrimino.create (7, 2) state.tetrimino.shape)
+            hold = Some(Tetrimino.create config.initialXY state.tetrimino.shape)
       }
     | NewGame -> init ()
     | _ -> state

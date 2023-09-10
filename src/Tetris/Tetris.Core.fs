@@ -71,6 +71,7 @@ let config = {|
     width = 16
     height = 26
     heightLimit = 2
+    initialXY = (7, 2)
 |}
 
 module TetrisBoard =
@@ -98,7 +99,7 @@ module TetrisBoard =
 
             nxt
 
-        let mutable eraced = 0
+        let mutable clearedLines = 0
 
         let dif =
             List.rev [
@@ -113,16 +114,19 @@ module TetrisBoard =
                             nxt[y, x] <- Empty
 
                         yield y
-                        eraced <- eraced + 1
+                        clearedLines <- clearedLines + 1
                     else
-                        yield y + eraced
+                        yield y + clearedLines
             ]
 
         for y in config.height - 4 .. -1 .. 0 do
             for x in 3 .. config.width - 4 do
                 nxt[dif[y], x] <- nxt[y, x]
 
-        {| newBoard = nxt; eraced = eraced |}
+        {|
+            newBoard = nxt
+            clearedLines = clearedLines
+        |}
 
 
 module Tetrimino =
@@ -210,7 +214,7 @@ module Tetrimino =
         | RotR
         | RotL
 
-    let private rotAsixs direction mino =
+    let private rotAxis direction mino =
         match direction with
         | RotR ->
             match mino.shape with
@@ -287,23 +291,23 @@ module Tetrimino =
         match mino.shape with
         | Shape.O -> mino
         | _ ->
-            let pos, rAsixs, rot =
+            let pos, axis, rot =
                 match direction with
-                | RotL -> Position.rotL mino.pos, rotAsixs direction mino, Vector.rotR
-                | RotR -> Position.rotR mino.pos, rotAsixs direction mino, Vector.rotL
+                | RotL -> Position.rotL mino.pos, rotAxis direction mino, Vector.rotR
+                | RotR -> Position.rotR mino.pos, rotAxis direction mino, Vector.rotL
 
-            let rec loop =
+            let rec search =
                 function
                 | [] -> mino
                 | shift :: t ->
-                    let rec loop2 =
+                    let rec tryRot =
                         function
-                        | [] -> loop t
-                        | relRotAsix :: t2 ->
+                        | [] -> search t
+                        | relRotAxis :: t2 ->
                             let (cx, cy) as center =
                                 (mino.x, mino.y)
-                                |> Vector.add relRotAsix
-                                |> Vector.add (rot relRotAsix)
+                                |> Vector.add relRotAxis
+                                |> Vector.add (rot relRotAxis)
                                 |> Vector.add shift
 
                             pos.XYs
@@ -311,13 +315,13 @@ module Tetrimino =
                                 Vector.add center >> TetrisBoard.isFilled board
                             )
                             |> function
-                                | true -> loop2 t2
+                                | true -> tryRot t2
                                 | false -> { mino with x = cx; y = cy; pos = pos }
 
-                    loop2 rAsixs
+                    tryRot axis
 
-            let spinned =
-                loop [
+            let spined =
+                search [
                     (0, 0)
                     (0, 1)
                     (-1, 0)
@@ -330,18 +334,15 @@ module Tetrimino =
                 ]
 
             let adjusted =
-                if spinned.y < mino.y then
-                    { spinned with y = spinned.y + 1 }
-                elif spinned.y > mino.y then
-                    { spinned with y = spinned.y - 1 }
-                else
-                    spinned
+                if spined.y < mino.y then { spined with y = spined.y + 1 }
+                elif spined.y > mino.y then { spined with y = spined.y - 1 }
+                else spined
 
             adjusted
             |> existsOtherBlock board
             |> function
                 | false -> adjusted
-                | true -> spinned
+                | true -> spined
 
     let rotateRight board mino = rotate RotR board mino
     let rotateLeft board mino = rotate RotL board mino
