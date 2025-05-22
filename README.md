@@ -18,8 +18,7 @@ Special spins are achieved by combining rotation around the candidate axis, dete
 ## 🎈 How to play
 
 ```sh
-cd src
-dotnet run --project Tetris
+dotnet run --project src/Tetris
 ```
 
 | Key | Action |
