@@ -22,28 +22,27 @@
       perSystem =
         { pkgs, ... }:
         {
-          devShells.default = pkgs.buildFHSEnv {
-            name = "tetris-shell";
-            targetPkgs =
-              pkgs:
-              with pkgs;
-              [
+          devShells = {
+            default = pkgs.mkShell {
+              name = "dev-shell";
+              buildInputs = with pkgs; [
                 dotnet-sdk_9
-                udev
-                alsa-lib
                 fontconfig
-                glew
-              ]
-              ++ (with pkgs.xorg; [
-                libX11
-                libICE
-                libSM
-                libXi
-                libXcursor
-                libXext
-                libXrandr
-              ]);
-            runScript = "zsh";
+                xorg.libICE
+                xorg.libSM
+                xorg.libX11
+              ];
+              shellHook = ''
+                export LD_LIBRARY_PATH=${
+                  pkgs.lib.makeLibraryPath [
+                    pkgs.fontconfig
+                    pkgs.xorg.libICE
+                    pkgs.xorg.libSM
+                    pkgs.xorg.libX11
+                  ]
+                }:$LD_LIBRARY_PATH
+              '';
+            };
           };
         };
     };
